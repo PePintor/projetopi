@@ -1,0 +1,34 @@
+name: app_projetoyuri
+description: Aplicativo de adoção e cadastro de pets
+
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.2
+  provider: ^6.1.1                    # ✅ ATUALIZADO
+  http: ^1.1.0                        # ✅ ATUALIZADO  
+  shared_preferences: ^2.2.2
+  sqflite: ^2.3.0                     # ✅ ATUALIZADO
+  path: ^1.8.3                        # ✅ ATUALIZADO
+  image_picker: ^1.0.4                # ✅ ATUALIZADO (versão null-safe)
+  flutter_dotenv: ^5.1.0              # ✅ ATUALIZADO (versão mais recente)
+  cached_network_image: ^3.3.0        # ✅ ATUALIZADO
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0               # ✅ ATUALIZADO
+
+flutter:
+  uses-material-design: true
+  
+  assets:
+    - assets/images/
+    - .env                            # ✅ CORRETO - .env como asset
