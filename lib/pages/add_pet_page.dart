@@ -33,13 +33,10 @@ class _AddPetPageState extends State<AddPetPage> {
   Future<void> _pickImages() async {
     if (_imageLoading) return;
 
-    setState(() {
-      _imageLoading = true;
-    });
+    setState(() => _imageLoading = true);
 
     try {
       final images = await ImagePickerUtils.pickMultipleImages();
-
       if (images != null && images.isNotEmpty) {
         setState(() {
           _selectedImages.addAll(images);
@@ -53,23 +50,19 @@ class _AddPetPageState extends State<AddPetPage> {
     } catch (e) {
       _showError('Erro ao selecionar imagens: $e');
     } finally {
-      setState(() {
-        _imageLoading = false;
-      });
+      setState(() => _imageLoading = false);
     }
   }
 
   void _removeImage(int index) {
-    setState(() {
-      _selectedImages.removeAt(index);
-    });
+    setState(() => _selectedImages.removeAt(index));
   }
 
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
+        backgroundColor: Theme.of(context).colorScheme.secondary,
         content: Text(message),
-        backgroundColor: Colors.red,
         duration: const Duration(seconds: 4),
       ),
     );
@@ -78,6 +71,7 @@ class _AddPetPageState extends State<AddPetPage> {
   void _showMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
+        backgroundColor: Theme.of(context).cardColor,
         content: Text(message),
         duration: const Duration(seconds: 2),
       ),
@@ -86,10 +80,12 @@ class _AddPetPageState extends State<AddPetPage> {
 
   void _showSuccess() {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Pet cadastrado com sucesso!'),
-        backgroundColor: Colors.green,
-        duration: Duration(seconds: 3),
+      SnackBar(
+        backgroundColor: Theme.of(context).primaryColor,
+        content: const Text(
+          'Pet cadastrado com sucesso!',
+          style: TextStyle(color: Colors.white),
+        ),
       ),
     );
   }
@@ -109,12 +105,9 @@ class _AddPetPageState extends State<AddPetPage> {
   void _submitForm() async {
     if (!_validateForm()) return;
 
-    setState(() {
-      _loading = true;
-    });
+    setState(() => _loading = true);
 
     try {
-      // ✅ CORREÇÃO: Use array vazio para fotos
       final pet = Pet(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         name: _nameController.text,
@@ -123,7 +116,7 @@ class _AddPetPageState extends State<AddPetPage> {
         age: _ageController.text,
         description: _descriptionController.text,
         careInstructions: _careController.text,
-        photos: [], // ✅ ARRAY VAZIO EM VEZ DE base64_placeholder
+        photos: [],
         vaccinated: _vaccinated,
         location: _locationController.text,
         contact: _contactController.text,
@@ -131,12 +124,7 @@ class _AddPetPageState extends State<AddPetPage> {
         createdAt: DateTime.now(),
       );
 
-      print('📝 ENVIANDO PET: ${pet.name}');
-      print('👤 USER ID: ${pet.userId}');
-
       final success = await context.read<PetProvider>().addPet(pet);
-
-      print('✅ RESULTADO DO CADASTRO: $success');
 
       if (success) {
         _showSuccess();
@@ -147,12 +135,9 @@ class _AddPetPageState extends State<AddPetPage> {
             'Erro ao cadastrar pet: ${context.read<PetProvider>().error}');
       }
     } catch (e) {
-      print('❌ ERRO NO SUBMIT: $e');
       _showError('Erro inesperado: $e');
     } finally {
-      setState(() {
-        _loading = false;
-      });
+      setState(() => _loading = false);
     }
   }
 
@@ -165,6 +150,7 @@ class _AddPetPageState extends State<AddPetPage> {
     _careController.clear();
     _locationController.clear();
     _contactController.clear();
+
     setState(() {
       _selectedImages = [];
       _vaccinated = false;
@@ -186,46 +172,51 @@ class _AddPetPageState extends State<AddPetPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('Cadastrar Pet'),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
+        backgroundColor: theme.appBarTheme.backgroundColor,
+        foregroundColor: theme.appBarTheme.foregroundColor,
+        elevation: 0,
         actions: [
           IconButton(
             icon: const Icon(Icons.clear),
             onPressed: _resetForm,
             tooltip: 'Limpar formulário',
+            color: theme.appBarTheme.foregroundColor,
           ),
         ],
       ),
       body: _loading
-          ? const Center(
+          ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 16),
-                  Text('Cadastrando pet...'),
+                  CircularProgressIndicator(color: theme.primaryColor),
+                  const SizedBox(height: 16),
+                  const Text('Cadastrando pet...'),
                 ],
               ),
             )
           : SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16),
               child: Form(
                 key: _formKey,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildPhotosSection(),
+                    _buildPhotosSection(theme),
                     const SizedBox(height: 24),
-                    _buildBasicInfoSection(),
+                    _buildBasicInfoSection(theme),
                     const SizedBox(height: 24),
-                    _buildCareSection(),
+                    _buildCareSection(theme),
                     const SizedBox(height: 24),
-                    _buildContactSection(),
+                    _buildContactSection(theme),
                     const SizedBox(height: 32),
-                    _buildSubmitButton(),
+                    _buildSubmitButton(theme),
                   ],
                 ),
               ),
@@ -233,27 +224,24 @@ class _AddPetPageState extends State<AddPetPage> {
     );
   }
 
-  Widget _buildPhotosSection() {
+  Widget _buildPhotosSection(ThemeData theme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Fotos do Pet*',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
+        Text('Fotos do Pet*',
+            style: TextStyle(
+                fontSize: 18, fontWeight: FontWeight.bold, color: theme.primaryColor)),
         const SizedBox(height: 8),
-        const Text(
-          'Adicione até 5 fotos (mínimo 1)',
-          style: TextStyle(color: Colors.grey),
-        ),
+        Text('Adicione até 5 fotos (mínimo 1)',
+            style: TextStyle(color: theme.colorScheme.onSurface)),
         const SizedBox(height: 12),
         if (_imageLoading)
-          const Center(
+          Center(
             child: Column(
               children: [
-                CircularProgressIndicator(),
-                SizedBox(height: 8),
-                Text('Carregando imagens...'),
+                CircularProgressIndicator(color: theme.primaryColor),
+                const SizedBox(height: 8),
+                const Text('Carregando imagens...'),
               ],
             ),
           )
@@ -265,67 +253,53 @@ class _AddPetPageState extends State<AddPetPage> {
               crossAxisCount: 3,
               crossAxisSpacing: 8,
               mainAxisSpacing: 8,
-              childAspectRatio: 1,
             ),
             itemCount: _selectedImages.length + 1,
             itemBuilder: (context, index) {
-              if (index == 0) {
-                return _buildAddPhotoButton();
-              } else {
-                return _buildPhotoPreview(index - 1);
-              }
+              if (index == 0) return _buildAddPhotoButton(theme);
+              return _buildPhotoPreview(index - 1, theme);
             },
           ),
       ],
     );
   }
 
-  Widget _buildAddPhotoButton() {
+  Widget _buildAddPhotoButton(ThemeData theme) {
     return GestureDetector(
       onTap: _imageLoading ? null : _pickImages,
       child: Container(
         decoration: BoxDecoration(
-          border: Border.all(color: _imageLoading ? Colors.grey : Colors.blue),
-          borderRadius: BorderRadius.circular(8),
-          color: _imageLoading ? Colors.grey[100] : null,
+          border: Border.all(
+            color: _imageLoading ? Colors.grey : theme.primaryColor,
+          ),
+          color: theme.cardColor,
+          borderRadius: BorderRadius.circular(12),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.add_a_photo,
-                size: 30, color: _imageLoading ? Colors.grey : Colors.blue),
-            const SizedBox(height: 4),
-            Text(
-              _imageLoading ? 'Carregando...' : 'Adicionar',
-              style: TextStyle(
-                  fontSize: 12,
-                  color: _imageLoading ? Colors.grey : Colors.blue),
-            ),
-          ],
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.add_a_photo, size: 30, color: theme.primaryColor),
+              const SizedBox(height: 4),
+              Text('Adicionar', style: TextStyle(fontSize: 12, color: theme.primaryColor)),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildPhotoPreview(int index) {
+  Widget _buildPhotoPreview(int index, ThemeData theme) {
     return Stack(
       children: [
         Container(
           decoration: BoxDecoration(
-            color: Colors.blue[100],
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.blue),
+            color: theme.cardColor,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: theme.primaryColor),
           ),
-          child: const Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.photo, size: 30, color: Colors.blue),
-                SizedBox(height: 4),
-                Text('Foto',
-                    style: TextStyle(fontSize: 10, color: Colors.blue)),
-              ],
-            ),
+          child: Center(
+            child: Icon(Icons.photo, size: 40, color: theme.primaryColor),
           ),
         ),
         Positioned(
@@ -347,167 +321,99 @@ class _AddPetPageState extends State<AddPetPage> {
     );
   }
 
-  Widget _buildBasicInfoSection() {
+  Widget _buildBasicInfoSection(ThemeData theme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Informações Básicas',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
+        Text('Informações Básicas',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: theme.primaryColor)),
         const SizedBox(height: 16),
-        _buildTextField(
-          controller: _nameController,
-          label: 'Nome do Pet*',
-          hint: 'Ex: Rex, Luna, Thor',
-          icon: Icons.pets,
-          validator: (value) =>
-              Validators.requiredField(value, fieldName: 'Nome do pet'),
-        ),
+        _buildTextField(_nameController, 'Nome do Pet*', 'Ex: Rex, Luna, Thor', Icons.pets, theme),
         const SizedBox(height: 12),
         Row(
           children: [
             Expanded(
-              child: _buildTextField(
-                controller: _speciesController,
-                label: 'Espécie*',
-                hint: 'Ex: Cachorro, Gato',
-                icon: Icons.category,
-                validator: (value) =>
-                    Validators.requiredField(value, fieldName: 'Espécie'),
-              ),
+              child: _buildTextField(_speciesController, 'Espécie*', 'Ex: Cachorro, Gato', Icons.category, theme),
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: _buildTextField(
-                controller: _breedController,
-                label: 'Raça*',
-                hint: 'Ex: Labrador, Siamês',
-                icon: Icons.emoji_nature,
-                validator: (value) =>
-                    Validators.requiredField(value, fieldName: 'Raça'),
-              ),
+              child: _buildTextField(_breedController, 'Raça*', 'Ex: Labrador, Siamês', Icons.emoji_nature, theme),
             ),
           ],
         ),
         const SizedBox(height: 12),
-        _buildTextField(
-          controller: _ageController,
-          label: 'Idade*',
-          hint: 'Ex: 2 anos, 6 meses',
-          icon: Icons.cake,
-          validator: Validators.validateAge,
-        ),
+        _buildTextField(_ageController, 'Idade*', 'Ex: 2 anos, 6 meses', Icons.cake, theme),
         const SizedBox(height: 12),
-        _buildTextField(
-          controller: _descriptionController,
-          label: 'Descrição*',
-          hint: 'Conte um pouco sobre o pet...',
-          icon: Icons.description,
-          maxLines: 3,
-          validator: Validators.validateDescription,
-        ),
+        _buildTextField(_descriptionController, 'Descrição*', 'Conte um pouco sobre o pet...', Icons.description, theme, maxLines: 3),
       ],
     );
   }
 
-  Widget _buildCareSection() {
+  Widget _buildCareSection(ThemeData theme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Cuidados e Saúde',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
+        Text('Cuidados e Saúde',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: theme.primaryColor)),
         const SizedBox(height: 16),
         Row(
           children: [
             Checkbox(
               value: _vaccinated,
-              onChanged: (value) {
-                setState(() {
-                  _vaccinated = value ?? false;
-                });
-              },
+              activeColor: theme.primaryColor,
+              onChanged: (value) => setState(() => _vaccinated = value ?? false),
             ),
             const Text('Pet vacinado'),
           ],
         ),
         const SizedBox(height: 12),
-        _buildTextField(
-          controller: _careController,
-          label: 'Cuidados Especiais',
-          hint: 'Alimentação, medicamentos, comportamento...',
-          icon: Icons.medical_services,
-          maxLines: 4,
-        ),
+        _buildTextField(_careController, 'Cuidados Especiais', 'Alimentação, medicamentos, comportamento...', Icons.medical_services, theme, maxLines: 4),
       ],
     );
   }
 
-  Widget _buildContactSection() {
+  Widget _buildContactSection(ThemeData theme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Localização e Contato',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
+        Text('Localização e Contato',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: theme.primaryColor)),
         const SizedBox(height: 16),
-        _buildTextField(
-          controller: _locationController,
-          label: 'Localização*',
-          hint: 'Ex: São Paulo, Centro',
-          icon: Icons.location_on,
-          validator: Validators.validateLocation,
-        ),
+        _buildTextField(_locationController, 'Localização*', 'Ex: São Paulo, Centro', Icons.location_on, theme),
         const SizedBox(height: 12),
-        _buildTextField(
-          controller: _contactController,
-          label: 'Contato*',
-          hint: 'Telefone ou email para contato',
-          icon: Icons.phone,
-          validator: Validators.validateContact,
-        ),
+        _buildTextField(_contactController, 'Contato*', 'Telefone ou email para contato', Icons.phone, theme),
       ],
     );
   }
 
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    required String hint,
-    required IconData icon,
-    int maxLines = 1,
-    String? Function(String?)? validator,
-  }) {
+  Widget _buildTextField(TextEditingController controller, String label, String hint, IconData icon, ThemeData theme, {int maxLines = 1}) {
     return TextFormField(
       controller: controller,
       maxLines: maxLines,
-      validator: validator,
+      validator: (value) => Validators.requiredField(value, fieldName: label),
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
-        prefixIcon: Icon(icon),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        prefixIcon: Icon(icon, color: theme.colorScheme.secondary),
+        filled: true,
+        fillColor: theme.cardColor,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: theme.primaryColor)),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: theme.colorScheme.secondary, width: 2)),
       ),
     );
   }
 
-  Widget _buildSubmitButton() {
+  Widget _buildSubmitButton(ThemeData theme) {
     return SizedBox(
       width: double.infinity,
       height: 50,
       child: ElevatedButton(
         onPressed: _loading ? null : _submitForm,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blue,
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
+          backgroundColor: theme.primaryColor,
+          foregroundColor: theme.colorScheme.onPrimary,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
         child: const Text(
           'CADASTRAR PET',

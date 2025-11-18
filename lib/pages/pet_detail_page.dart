@@ -8,11 +8,20 @@ class PetDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    final Color primaryColor = theme.primaryColor;
+    final Color backgroundColor = theme.scaffoldBackgroundColor;
+    final Color accentGreen = Colors.green.shade400;
+    final Color accentRed = Colors.red.shade400;
+    final Color darkText = theme.textTheme.bodyLarge?.color ?? Colors.brown.shade700;
+
     return Scaffold(
+      backgroundColor: backgroundColor,
       appBar: AppBar(
         title: Text(pet.name),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
+        backgroundColor: primaryColor,
+        foregroundColor: theme.colorScheme.onPrimary,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -23,7 +32,7 @@ class PetDetailPage extends StatelessWidget {
             Container(
               height: 200,
               decoration: BoxDecoration(
-                color: Colors.grey[300],
+                color: primaryColor.withOpacity(0.3),
                 borderRadius: BorderRadius.circular(12),
                 image: pet.photos.isNotEmpty
                     ? DecorationImage(
@@ -33,82 +42,79 @@ class PetDetailPage extends StatelessWidget {
                     : null,
               ),
               child: pet.photos.isEmpty
-                  ? const Center(
-                      child: Icon(Icons.pets, size: 64, color: Colors.grey),
+                  ? Center(
+                      child: Icon(
+                        Icons.pets,
+                        size: 64,
+                        color: darkText,
+                      ),
                     )
                   : null,
             ),
             const SizedBox(height: 20),
 
             // Informações básicas
-            const Text(
-              'Informações Básicas',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
+            _sectionTitle('Informações Básicas', darkText),
             const SizedBox(height: 12),
-            _buildInfoItem('Nome', pet.name),
-            _buildInfoItem('Espécie', pet.species),
-            _buildInfoItem('Raça', pet.breed),
-            _buildInfoItem('Idade', pet.age),
-            _buildInfoItem('Localização', pet.location),
+            _buildInfoItem('Nome', pet.name, darkText),
+            _buildInfoItem('Espécie', pet.species, darkText),
+            _buildInfoItem('Raça', pet.breed, darkText),
+            _buildInfoItem('Idade', pet.age, darkText),
+            _buildInfoItem('Localização', pet.location, darkText),
+
             const SizedBox(height: 20),
 
             // Descrição
-            const Text(
-              'Descrição',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
+            _sectionTitle('Descrição', darkText),
             const SizedBox(height: 8),
             Text(
               pet.description.isEmpty ? 'Sem descrição' : pet.description,
-              style: const TextStyle(fontSize: 16),
+              style: TextStyle(fontSize: 16, color: darkText),
             ),
+
             const SizedBox(height: 20),
 
             // Cuidados especiais
-            const Text(
-              'Cuidados Especiais',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
+            _sectionTitle('Cuidados Especiais', darkText),
             const SizedBox(height: 8),
             Text(
               pet.careInstructions.isEmpty
                   ? 'Nenhum cuidado especial informado'
                   : pet.careInstructions,
-              style: const TextStyle(fontSize: 16),
+              style: TextStyle(fontSize: 16, color: darkText),
             ),
+
             const SizedBox(height: 20),
 
             // Saúde
-            const Text(
-              'Saúde',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
+            _sectionTitle('Saúde', darkText),
             const SizedBox(height: 8),
             Row(
               children: [
                 Icon(
                   pet.vaccinated ? Icons.check_circle : Icons.cancel,
-                  color: pet.vaccinated ? Colors.green : Colors.red,
+                  color: pet.vaccinated ? accentGreen : accentRed,
                 ),
                 const SizedBox(width: 8),
                 Text(
                   pet.vaccinated ? 'Pet vacinado' : 'Não vacinado',
                   style: TextStyle(
-                    color: pet.vaccinated ? Colors.green : Colors.red,
+                    color: pet.vaccinated ? accentGreen : accentRed,
                   ),
                 ),
               ],
             ),
+
             const SizedBox(height: 20),
 
             // Contato
-            const Text(
-              'Contato',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
+            _sectionTitle('Contato', darkText),
             const SizedBox(height: 8),
-            Text(pet.contact),
+            Text(
+              pet.contact,
+              style: TextStyle(color: darkText),
+            ),
+
             const SizedBox(height: 30),
 
             // Botão de contato
@@ -118,14 +124,13 @@ class PetDetailPage extends StatelessWidget {
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content:
-                          Text('Entrando em contato sobre o ${pet.name}...'),
-                      backgroundColor: Colors.green,
+                      content: Text('Entrando em contato sobre o ${pet.name}...'),
+                      backgroundColor: accentGreen,
                     ),
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
+                  backgroundColor: accentGreen,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 15),
                 ),
@@ -138,16 +143,28 @@ class PetDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoItem(String label, String value) {
+  Widget _sectionTitle(String title, Color color) {
+    return Text(
+      title,
+      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: color),
+    );
+  }
+
+  Widget _buildInfoItem(String label, String value, Color color) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
         children: [
           Text(
             '$label: ',
-            style: const TextStyle(fontWeight: FontWeight.bold),
+            style: TextStyle(fontWeight: FontWeight.bold, color: color),
           ),
-          Text(value.isEmpty ? 'Não informado' : value),
+          Expanded(
+            child: Text(
+              value.isEmpty ? 'Não informado' : value,
+              style: TextStyle(color: color),
+            ),
+          ),
         ],
       ),
     );

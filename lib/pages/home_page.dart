@@ -7,7 +7,7 @@ import 'package:app_projetoyuri/pages/settings_page.dart';
 import 'package:app_projetoyuri/pages/pet_detail_page.dart';
 import 'package:app_projetoyuri/models/pet_model.dart';
 import 'package:app_projetoyuri/providers/pet_provider.dart';
-import 'package:app_projetoyuri/utils/constants.dart'; // ✅ AGORA SERÁ UTILIZADO
+import 'package:app_projetoyuri/utils/constants.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -38,9 +38,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _onPetsChanged() {
-    if (mounted) {
-      setState(() {});
-    }
+    if (mounted) setState(() {});
   }
 
   void _onItemTapped(int index) {
@@ -60,23 +58,20 @@ class _HomePageState extends State<HomePage> {
     );
 
     if (result == true && context.mounted) {
-      print('🔄 FORÇANDO ATUALIZAÇÃO DA HOME...');
       setState(() {
         _selectedIndex = 0;
       });
 
       await Future.delayed(const Duration(milliseconds: 500));
 
-      if (context.mounted) {
-        setState(() {});
-      }
+      if (context.mounted) setState(() {});
     }
   }
 
   Widget _getCurrentPage() {
     switch (_selectedIndex) {
       case 0:
-        return _HomeContent();
+        return const _HomeContent();
       case 1:
         return const MyPetsPage();
       case 3:
@@ -84,37 +79,59 @@ class _HomePageState extends State<HomePage> {
       case 4:
         return const SettingsPage();
       default:
-        return _HomeContent();
+        return const _HomeContent();
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text(AppConstants.appName), // ✅ CONSTANTE UTILIZADA
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
+        backgroundColor: theme.appBarTheme.backgroundColor,
+        foregroundColor: theme.appBarTheme.foregroundColor,
+        title: Row(
+          children: [
+            Image.asset(
+              "assets/images/logoAdotaJa.png",
+              height: 32,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              AppConstants.appName,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+                color: theme.appBarTheme.foregroundColor,
+              ),
+            ),
+          ],
+        ),
       ),
       body: _getCurrentPage(),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.grey,
+        backgroundColor: theme.bottomAppBarColor,
+        selectedItemColor: theme.primaryColor,
+        unselectedItemColor: theme.unselectedWidgetColor,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.pets), label: 'Meus Pets'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.add_circle), label: 'Adicionar'),
+          BottomNavigationBarItem(icon: Icon(Icons.add_circle), label: 'Adicionar'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
           BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Config'),
         ],
       ),
     );
   }
+}
+
+extension on ThemeData {
+  Color? get bottomAppBarColor => null;
 }
 
 class _HomeContent extends StatefulWidget {
@@ -136,24 +153,22 @@ class _HomeContentState extends State<_HomeContent> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Consumer<PetProvider>(
       builder: (context, petProvider, child) {
-        print('🏠 HOME CONTENT - Total pets: ${petProvider.pets.length}');
-        print('🐾 Pets: ${petProvider.pets.map((p) => p.name).toList()}');
-
-        // ✅ FILTRA OS PETS BASEADO NA PESQUISA
         final displayedPets = _searchQuery.isEmpty
             ? petProvider.pets
             : petProvider.searchPets(_searchQuery);
 
         if (petProvider.loading && petProvider.pets.isEmpty) {
-          return const Center(
+          return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                CircularProgressIndicator(),
-                SizedBox(height: 16),
-                Text('Carregando pets...'),
+                CircularProgressIndicator(color: theme.primaryColor),
+                const SizedBox(height: 16),
+                const Text('Carregando pets...'),
               ],
             ),
           );
@@ -164,22 +179,26 @@ class _HomeContentState extends State<_HomeContent> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.error, size: 64, color: Colors.red),
-                SizedBox(height: 16),
+                Icon(Icons.error, size: 64, color: theme.primaryColor),
+                const SizedBox(height: 16),
                 Text(
                   'Erro ao carregar pets',
-                  style: TextStyle(fontSize: 18, color: Colors.red),
+                  style: TextStyle(fontSize: 18, color: theme.primaryColor),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Text(
                   petProvider.error,
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.grey),
+                  style: TextStyle(color: theme.textTheme.bodyMedium?.color),
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: theme.primaryColor,
+                    foregroundColor: theme.colorScheme.onPrimary,
+                  ),
                   onPressed: () => petProvider.loadPets(),
-                  child: Text('Tentar Novamente'),
+                  child: const Text('Tentar Novamente'),
                 ),
               ],
             ),
@@ -188,115 +207,56 @@ class _HomeContentState extends State<_HomeContent> {
 
         return Column(
           children: [
-            // ✅ BARRA DE PESQUISA AVANÇADA
             Padding(
-              padding: const EdgeInsets.all(
-                  AppConstants.defaultPadding), // ✅ CONSTANTE
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  TextField(
-                    controller: _searchController,
-                    onChanged: (value) {
-                      setState(() {
-                        _searchQuery = value;
-                      });
-                    },
-                    decoration: InputDecoration(
-                      hintText: '🔍 Pesquisar pets...',
-                      helperText:
-                          'Busque por nome, raça, espécie, localização, idade ou descrição',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(
-                            AppConstants.defaultBorderRadius), // ✅ CONSTANTE
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 15),
-                      suffixIcon: _searchQuery.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(Icons.clear),
-                              onPressed: () {
-                                _searchController.clear();
-                                setState(() {
-                                  _searchQuery = '';
-                                });
-                              },
-                            )
-                          : null,
-                    ),
+              padding: const EdgeInsets.all(AppConstants.defaultPadding),
+              child: TextField(
+                controller: _searchController,
+                onChanged: (value) => setState(() => _searchQuery = value),
+                decoration: InputDecoration(
+                  hintText: '🔍 Pesquisar pets...',
+                  filled: true,
+                  fillColor: theme.cardColor,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(AppConstants.defaultBorderRadius),
                   ),
-                  const SizedBox(height: 8),
-                  // ✅ SUGESTÕES DE PESQUISA RÁPIDA
-                  if (_searchQuery.isEmpty)
-                    Wrap(
-                      spacing: 8,
-                      children: [
-                        _buildQuickFilter('🐕 Cachorro', 'cachorro'),
-                        _buildQuickFilter('🐈 Gato', 'gato'),
-                        _buildQuickFilter('🐹 Hamster', 'hamster'),
-                        _buildQuickFilter('🐦 Calopsita', 'calopsita'),
-                        _buildQuickFilter('💉 Vacinados', 'vacinado'),
-                        _buildQuickFilter('🔍 Ver todos', ''),
-                      ],
-                    ),
-                ],
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: theme.primaryColor, width: 2),
+                    borderRadius: BorderRadius.circular(AppConstants.defaultBorderRadius),
+                  ),
+                  suffixIcon: _searchQuery.isNotEmpty
+                      ? IconButton(
+                          icon: Icon(Icons.clear, color: theme.primaryColor),
+                          onPressed: () {
+                            _searchController.clear();
+                            setState(() => _searchQuery = '');
+                          },
+                        )
+                      : null,
+                ),
               ),
             ),
-
-            // ✅ MOSTRA RESULTADOS DA PESQUISA
             if (_searchQuery.isNotEmpty)
               Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: AppConstants.defaultPadding), // ✅ CONSTANTE
+                padding: const EdgeInsets.symmetric(horizontal: AppConstants.defaultPadding),
                 child: Row(
                   children: [
                     Text(
                       '${displayedPets.length} pets encontrados',
                       style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: AppConstants.captionFontSize, // ✅ CONSTANTE
+                        color: theme.textTheme.bodyMedium?.color,
+                        fontSize: AppConstants.captionFontSize,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    if (_searchQuery.isNotEmpty) ...[
-                      const SizedBox(width: 8),
-                      GestureDetector(
-                        onTap: () {
-                          _searchController.clear();
-                          setState(() {
-                            _searchQuery = '';
-                          });
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: Colors.grey[200],
-                            borderRadius: BorderRadius.circular(AppConstants
-                                .defaultBorderRadius), // ✅ CONSTANTE
-                          ),
-                          child: Row(
-                            children: [
-                              Text(
-                                '"$_searchQuery"',
-                                style: const TextStyle(fontSize: 12),
-                              ),
-                              const SizedBox(width: 4),
-                              Icon(Icons.close, size: 14),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
                   ],
                 ),
               ),
-
             Expanded(
               child: RefreshIndicator(
+                color: theme.primaryColor,
                 onRefresh: () => petProvider.loadPets(),
                 child: displayedPets.isEmpty
-                    ? _buildEmptyState(_searchQuery)
+                    ? _buildEmptyState(theme)
                     : ListView.builder(
                         itemCount: displayedPets.length,
                         itemBuilder: (context, index) {
@@ -312,71 +272,22 @@ class _HomeContentState extends State<_HomeContent> {
     );
   }
 
-  // ✅ BOTÕES DE PESQUISA RÁPIDA
-  Widget _buildQuickFilter(String label, String query) {
-    return GestureDetector(
-      onTap: () {
-        _searchController.text = query;
-        setState(() {
-          _searchQuery = query;
-        });
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: Colors.blue[50],
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.blue[100]!),
-        ),
-        child: Text(
-          label,
-          style: const TextStyle(
-            fontSize: 12,
-            color: Colors.blue,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ),
-    );
-  }
-
-  // ✅ ESTADO VAZIO MELHORADO
-  Widget _buildEmptyState(String query) {
+  Widget _buildEmptyState(ThemeData theme) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.search, size: 64, color: Colors.grey[400]),
+          Icon(Icons.search, size: 64, color: theme.disabledColor),
           const SizedBox(height: 16),
           Text(
-            query.isEmpty
-                ? AppConstants.noPetsFound
-                : 'Nenhum pet encontrado', // ✅ CONSTANTE
-            style: TextStyle(
-                fontSize: AppConstants.subheadingFontSize,
-                color: Colors.grey[600]), // ✅ CONSTANTE
+            _searchQuery.isEmpty ? AppConstants.noPetsFound : 'Nenhum pet encontrado',
+            style: TextStyle(fontSize: AppConstants.subheadingFontSize, color: theme.textTheme.bodyMedium?.color),
           ),
           const SizedBox(height: 8),
           Text(
-            query.isEmpty
-                ? 'Clique em + para adicionar um pet'
-                : 'Tente buscar por outro termo',
-            style: TextStyle(
-                color: Colors.grey[500],
-                fontSize: AppConstants.captionFontSize), // ✅ CONSTANTE
+            _searchQuery.isEmpty ? 'Clique em + para adicionar um pet' : 'Tente buscar por outro termo',
+            style: TextStyle(color: theme.textTheme.bodySmall?.color, fontSize: AppConstants.captionFontSize),
           ),
-          if (query.isNotEmpty) ...[
-            const SizedBox(height: 16),
-            Wrap(
-              spacing: 8,
-              children: [
-                _buildQuickFilter('🐕 Cachorro', 'cachorro'),
-                _buildQuickFilter('🐈 Gato', 'gato'),
-                _buildQuickFilter('🐹 Hamster', 'hamster'),
-                _buildQuickFilter('💉 Vacinados', 'vacinado'),
-              ],
-            ),
-          ],
         ],
       ),
     );
@@ -385,106 +296,75 @@ class _HomeContentState extends State<_HomeContent> {
 
 class _PetCard extends StatelessWidget {
   final Pet pet;
-
   const _PetCard({required this.pet});
 
   void _navigateToPetDetail(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => PetDetailPage(pet: pet)),
-    );
+    Navigator.push(context, MaterialPageRoute(builder: (_) => PetDetailPage(pet: pet)));
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Card(
-      margin: const EdgeInsets.symmetric(
-          horizontal: AppConstants.defaultPadding, vertical: 8), // ✅ CONSTANTE
-      elevation: AppConstants.cardElevation, // ✅ CONSTANTE
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(
-              AppConstants.defaultBorderRadius)), // ✅ CONSTANTE
+      margin: const EdgeInsets.symmetric(horizontal: AppConstants.defaultPadding, vertical: 8),
+      elevation: AppConstants.cardElevation,
+      color: theme.cardColor,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppConstants.defaultBorderRadius)),
       child: InkWell(
         onTap: () => _navigateToPetDetail(context),
-        borderRadius: BorderRadius.circular(
-            AppConstants.defaultBorderRadius), // ✅ CONSTANTE
+        borderRadius: BorderRadius.circular(AppConstants.defaultBorderRadius),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ClipRRect(
-              borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(
-                      AppConstants.defaultBorderRadius)), // ✅ CONSTANTE
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(AppConstants.defaultBorderRadius)),
               child: Container(
                 height: 200,
-                width: double.infinity,
-                color: Colors.grey[200],
+                color: theme.cardColor,
                 child: pet.photos.isNotEmpty
                     ? Image.network(
                         pet.photos.first,
                         height: 200,
                         width: double.infinity,
                         fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return _buildPlaceholderImage();
-                        },
                       )
-                    : _buildPlaceholderImage(),
+                    : _buildPlaceholderImage(theme),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(
-                  AppConstants.defaultPadding), // ✅ CONSTANTE
+              padding: const EdgeInsets.all(AppConstants.defaultPadding),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        pet.name,
-                        style: const TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
+                  Text(pet.name, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: theme.primaryColor)),
                   const SizedBox(height: 8),
-                  Text('${pet.species} • ${pet.breed}',
-                      style: const TextStyle(color: Colors.grey)),
+                  Text('${pet.species} • ${pet.breed}', style: TextStyle(color: theme.textTheme.bodySmall?.color)),
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      Icon(Icons.location_on,
-                          size: 18, color: Colors.grey[600]),
+                      Icon(Icons.location_on, size: 18, color: theme.disabledColor),
                       const SizedBox(width: 4),
-                      Expanded(
-                          child: Text(pet.location,
-                              style: TextStyle(color: Colors.grey[600]))),
-                      Icon(Icons.cake, size: 18, color: Colors.grey[600]),
+                      Expanded(child: Text(pet.location, style: TextStyle(color: theme.disabledColor))),
+                      Icon(Icons.cake, size: 18, color: theme.disabledColor),
                       const SizedBox(width: 4),
-                      Text(pet.age,
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold, color: Colors.blue)),
+                      Text(pet.age, style: TextStyle(fontWeight: FontWeight.bold, color: theme.primaryColor)),
                     ],
                   ),
-                  // ✅ MOSTRA STATUS DE VACINA (campo que existe)
                   const SizedBox(height: 4),
                   Row(
                     children: [
                       Icon(
-                        pet.vaccinated
-                            ? Icons.medical_services
-                            : Icons.medical_services_outlined,
+                        pet.vaccinated ? Icons.medical_services : Icons.medical_services_outlined,
                         size: 16,
-                        color: pet.vaccinated ? Colors.green : Colors.grey,
+                        color: pet.vaccinated ? Colors.green : theme.disabledColor,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         pet.vaccinated ? 'Vacinado' : 'Não vacinado',
                         style: TextStyle(
-                          fontSize: AppConstants.smallFontSize, // ✅ CONSTANTE
-                          color:
-                              pet.vaccinated ? Colors.green : Colors.grey[600],
+                          fontSize: AppConstants.smallFontSize,
+                          color: pet.vaccinated ? Colors.green : theme.disabledColor,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -499,13 +379,13 @@ class _PetCard extends StatelessWidget {
     );
   }
 
-  Widget _buildPlaceholderImage() {
-    return const Column(
+  Widget _buildPlaceholderImage(ThemeData theme) {
+    return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(Icons.pets, size: 50, color: Colors.grey),
-        SizedBox(height: 8),
-        Text('Sem foto', style: TextStyle(color: Colors.grey)),
+        Icon(Icons.pets, size: 50, color: theme.disabledColor),
+        const SizedBox(height: 8),
+        Text('Sem foto', style: TextStyle(color: theme.disabledColor)),
       ],
     );
   }

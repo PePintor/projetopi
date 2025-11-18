@@ -25,47 +25,51 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Consumer<AuthProvider>(
       builder: (context, authProvider, child) {
         return Scaffold(
-          backgroundColor: Colors.white,
+          backgroundColor: theme.scaffoldBackgroundColor,
           body: SafeArea(
             child: Center(
               child: Padding(
                 padding: const EdgeInsets.all(24.0),
                 child: Form(
-                  key: _formKey, // ✅ FORM KEY ADICIONADO
+                  key: _formKey,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       // Logo
-                      const Icon(
-                        Icons.pets,
-                        size: 60,
-                        color: Colors.blue,
+                      SizedBox(
+                        height: 80,
+                        child: Image.asset(
+                          'assets/images/logoAdotaJa.png',
+                          fit: BoxFit.contain,
+                        ),
                       ),
                       const SizedBox(height: 16),
-                      const Text(
+                      Text(
                         'AdojaJá',
                         style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
-                          color: Colors.blue,
+                          color: theme.primaryColor,
                         ),
                       ),
                       const SizedBox(height: 40),
 
-                      // E-mail COM VALIDAÇÃO
+                      // E-mail
                       TextFormField(
                         controller: _emailController,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: 'E-mail',
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.email),
+                          labelStyle: TextStyle(color: theme.primaryColor),
+                          border: const OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.email, color: theme.primaryColor),
                         ),
                         keyboardType: TextInputType.emailAddress,
-                        validator:
-                            Validators.validateEmail, // ✅ VALIDAÇÃO DE EMAIL
+                        validator: Validators.validateEmail,
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                       ),
                       const SizedBox(height: 16),
@@ -76,13 +80,13 @@ class _LoginPageState extends State<LoginPage> {
                         obscureText: _obscurePassword,
                         decoration: InputDecoration(
                           labelText: 'Senha',
+                          labelStyle: TextStyle(color: theme.primaryColor),
                           border: const OutlineInputBorder(),
-                          prefixIcon: const Icon(Icons.lock),
+                          prefixIcon: Icon(Icons.lock, color: theme.primaryColor),
                           suffixIcon: IconButton(
                             icon: Icon(
-                              _obscurePassword
-                                  ? Icons.visibility
-                                  : Icons.visibility_off,
+                              _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                              color: theme.primaryColor,
                             ),
                             onPressed: () {
                               setState(() {
@@ -109,14 +113,15 @@ class _LoginPageState extends State<LoginPage> {
                         width: double.infinity,
                         height: 50,
                         child: authProvider.loading
-                            ? const Center(
-                                child: CircularProgressIndicator(),
-                              )
+                            ? Center(child: CircularProgressIndicator(color: theme.primaryColor))
                             : ElevatedButton(
                                 onPressed: () => _login(context, authProvider),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.blue,
-                                  foregroundColor: Colors.white,
+                                  backgroundColor: theme.primaryColor,
+                                  foregroundColor: theme.colorScheme.onPrimary,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
                                 ),
                                 child: const Text(
                                   'Entrar',
@@ -132,8 +137,8 @@ class _LoginPageState extends State<LoginPage> {
                           padding: const EdgeInsets.only(bottom: 16),
                           child: Text(
                             authProvider.error,
-                            style: const TextStyle(
-                              color: Colors.red,
+                            style: TextStyle(
+                              color: theme.colorScheme.error,
                               fontSize: 14,
                             ),
                             textAlign: TextAlign.center,
@@ -144,13 +149,16 @@ class _LoginPageState extends State<LoginPage> {
                       TextButton(
                         onPressed: () {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Cadastro em desenvolvimento'),
-                              backgroundColor: Colors.blue,
+                            SnackBar(
+                              content: const Text('Cadastro em desenvolvimento'),
+                              backgroundColor: theme.primaryColor,
                             ),
                           );
                         },
-                        child: const Text('Não tem conta? Cadastre-se'),
+                        child: Text(
+                          'Não tem conta? Cadastre-se',
+                          style: TextStyle(color: theme.primaryColor),
+                        ),
                       ),
                     ],
                   ),
@@ -164,10 +172,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _login(BuildContext context, AuthProvider authProvider) async {
-    // ✅ VALIDA O FORMULÁRIO ANTES DE FAZER LOGIN
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
+    if (!_formKey.currentState!.validate()) return;
 
     final success = await authProvider.login(
       _emailController.text.trim(),
@@ -176,13 +181,12 @@ class _LoginPageState extends State<LoginPage> {
 
     if (success && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Login realizado com sucesso!'),
-          backgroundColor: Colors.green,
+        SnackBar(
+          content: const Text('Login realizado com sucesso!'),
+          backgroundColor: Theme.of(context).primaryColor,
         ),
       );
 
-      // Navega para Home após login
       Navigator.pushReplacementNamed(context, '/home');
     }
   }

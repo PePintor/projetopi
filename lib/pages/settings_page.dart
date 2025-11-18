@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:app_projetoyuri/providers/theme_provider.dart'; // ← IMPORT CORRIGIDO
+import 'package:app_projetoyuri/providers/theme_provider.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
 
   void _showLogoutDialog(BuildContext context) {
+    final secondaryColor = Theme.of(context).colorScheme.secondary;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -14,23 +16,22 @@ class SettingsPage extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
+            child: Text('Cancelar', style: TextStyle(color: secondaryColor)),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Você saiu da conta'),
-                  backgroundColor: Colors.red,
+                SnackBar(
+                  content: const Text('Você saiu da conta'),
+                  backgroundColor: secondaryColor,
                 ),
               );
-              // Navega para login
               Future.delayed(const Duration(seconds: 1), () {
                 Navigator.pushReplacementNamed(context, '/login');
               });
             },
-            child: const Text('Sair', style: TextStyle(color: Colors.red)),
+            child: Text('Sair', style: TextStyle(color: secondaryColor)),
           ),
         ],
       ),
@@ -40,12 +41,15 @@ class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
+    final secondaryColor = Theme.of(context).colorScheme.secondary;
+    final primaryColor = Theme.of(context).primaryColor;
 
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('Configurações'),
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        foregroundColor: Colors.white,
+        foregroundColor: Theme.of(context).appBarTheme.foregroundColor,
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -57,8 +61,7 @@ class SettingsPage extends StatelessWidget {
               child: ListTile(
                 leading: Icon(
                   themeProvider.isDarkMode ? Icons.dark_mode : Icons.light_mode,
-                  color:
-                      themeProvider.isDarkMode ? Colors.blue[200] : Colors.blue,
+                  color: secondaryColor,
                 ),
                 title: const Text('Tema Escuro'),
                 subtitle: Text(
@@ -74,10 +77,7 @@ class SettingsPage extends StatelessWidget {
                 trailing: Switch(
                   value: themeProvider.isDarkMode,
                   onChanged: (value) {
-                    // Altera o tema de TODO O APP
                     themeProvider.toggleTheme(value);
-
-                    // Mostra mensagem de sucesso
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
@@ -86,12 +86,12 @@ class SettingsPage extends StatelessWidget {
                               : 'Tema claro ativado ☀️',
                           style: const TextStyle(color: Colors.white),
                         ),
-                        backgroundColor: value ? Colors.grey[800] : Colors.blue,
+                        backgroundColor: primaryColor,
                         duration: const Duration(seconds: 2),
                       ),
                     );
                   },
-                  activeColor: Colors.blue,
+                  activeThumbColor: primaryColor,
                 ),
               ),
             ),
@@ -103,11 +103,9 @@ class SettingsPage extends StatelessWidget {
               child: ListTile(
                 leading: Icon(
                   Icons.info,
-                  color: themeProvider.isDarkMode
-                      ? Colors.green[200]
-                      : Colors.green,
+                  color: secondaryColor,
                 ),
-                title: const Text('AdotePet'),
+                title: const Text('AdotaJá'),
                 subtitle: const Text('Versão 1.0.0'),
               ),
             ),
@@ -119,18 +117,14 @@ class SettingsPage extends StatelessWidget {
               child: ListTile(
                 leading: Icon(
                   Icons.help,
-                  color: themeProvider.isDarkMode
-                      ? Colors.orange[200]
-                      : Colors.orange,
+                  color: secondaryColor,
                 ),
                 title: const Text('Ajuda e Suporte'),
                 onTap: () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: const Text('Abrindo ajuda e suporte...'),
-                      backgroundColor: themeProvider.isDarkMode
-                          ? Colors.orange[800]
-                          : Colors.orange,
+                      backgroundColor: secondaryColor,
                     ),
                   );
                 },
@@ -144,18 +138,14 @@ class SettingsPage extends StatelessWidget {
               child: ListTile(
                 leading: Icon(
                   Icons.security,
-                  color: themeProvider.isDarkMode
-                      ? Colors.purple[200]
-                      : Colors.purple,
+                  color: secondaryColor,
                 ),
                 title: const Text('Política de Privacidade'),
                 onTap: () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: const Text('Abrindo política de privacidade...'),
-                      backgroundColor: themeProvider.isDarkMode
-                          ? Colors.purple[800]
-                          : Colors.purple,
+                      backgroundColor: secondaryColor,
                     ),
                   );
                 },
@@ -169,7 +159,7 @@ class SettingsPage extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: () => _showLogoutDialog(context),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
+                  backgroundColor: secondaryColor,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 15),
                   shape: RoundedRectangleBorder(

@@ -30,7 +30,6 @@ class _EditPetPageState extends State<EditPetPage> {
   @override
   void initState() {
     super.initState();
-    // Preenche os campos com os dados atuais do pet
     _nameController.text = widget.pet.name;
     _speciesController.text = widget.pet.species;
     _breedController.text = widget.pet.breed;
@@ -57,9 +56,9 @@ class _EditPetPageState extends State<EditPetPage> {
 
   void _showSuccess() {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Pet atualizado com sucesso!'),
-        backgroundColor: Colors.green,
+      SnackBar(
+        content: const Text('Pet atualizado com sucesso!'),
+        backgroundColor: Theme.of(context).colorScheme.secondary,
       ),
     );
   }
@@ -68,7 +67,7 @@ class _EditPetPageState extends State<EditPetPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Erro: $error'),
-        backgroundColor: Colors.red,
+        backgroundColor: Theme.of(context).colorScheme.secondary,
       ),
     );
   }
@@ -79,9 +78,7 @@ class _EditPetPageState extends State<EditPetPage> {
       return;
     }
 
-    setState(() {
-      _loading = true;
-    });
+    setState(() => _loading = true);
 
     try {
       final updatedPet = widget.pet.copyWith(
@@ -108,44 +105,48 @@ class _EditPetPageState extends State<EditPetPage> {
     } catch (e) {
       _showError('$e');
     } finally {
-      if (mounted) {
-        setState(() {
-          _loading = false;
-        });
-      }
+      if (mounted) setState(() => _loading = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('Editar Pet'),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
+        backgroundColor: theme.appBarTheme.backgroundColor,
+        foregroundColor: theme.appBarTheme.foregroundColor,
         actions: [
           IconButton(
             icon: const Icon(Icons.save),
             onPressed: _loading ? null : _submitForm,
             tooltip: 'Salvar alterações',
+            color: theme.appBarTheme.foregroundColor,
           ),
         ],
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(
+              child: CircularProgressIndicator(
+                color: theme.primaryColor,
+              ),
+            )
           : SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
               child: Form(
                 key: _formKey,
                 child: Column(
                   children: [
-                    // ✅ VALIDADORES CORRETOS E ESPECÍFICOS:
                     _buildTextField(
                       controller: _nameController,
                       label: 'Nome do Pet*',
                       icon: Icons.pets,
-                      validator: (value) => Validators.validateName(value,
-                          fieldName: 'Nome do pet'),
+                      validator: (value) =>
+                          Validators.validateName(value, fieldName: 'Nome do pet'),
+                      theme: theme,
                     ),
                     const SizedBox(height: 12),
                     Row(
@@ -155,8 +156,8 @@ class _EditPetPageState extends State<EditPetPage> {
                             controller: _speciesController,
                             label: 'Espécie*',
                             icon: Icons.category,
-                            validator: Validators
-                                .validateSpecies, // ✅ VALIDADOR ESPECÍFICO
+                            validator: Validators.validateSpecies,
+                            theme: theme,
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -165,10 +166,9 @@ class _EditPetPageState extends State<EditPetPage> {
                             controller: _breedController,
                             label: 'Raça*',
                             icon: Icons.emoji_nature,
-                            validator: (value) => Validators.validateBreed(
-                                value,
-                                _speciesController
-                                    .text), // ✅ VALIDADOR ESPECÍFICO
+                            validator: (value) =>
+                                Validators.validateBreed(value, _speciesController.text),
+                            theme: theme,
                           ),
                         ),
                       ],
@@ -179,6 +179,7 @@ class _EditPetPageState extends State<EditPetPage> {
                       label: 'Idade*',
                       icon: Icons.cake,
                       validator: Validators.validateAge,
+                      theme: theme,
                     ),
                     const SizedBox(height: 12),
                     _buildTextField(
@@ -187,6 +188,7 @@ class _EditPetPageState extends State<EditPetPage> {
                       icon: Icons.description,
                       maxLines: 3,
                       validator: Validators.validateDescription,
+                      theme: theme,
                     ),
                     const SizedBox(height: 12),
                     _buildTextField(
@@ -195,6 +197,7 @@ class _EditPetPageState extends State<EditPetPage> {
                       hint: 'Alimentação, medicamentos, comportamento...',
                       icon: Icons.medical_services,
                       maxLines: 3,
+                      theme: theme,
                     ),
                     const SizedBox(height: 12),
                     Row(
@@ -206,6 +209,7 @@ class _EditPetPageState extends State<EditPetPage> {
                               _vaccinated = value ?? false;
                             });
                           },
+                          fillColor: MaterialStateProperty.all(theme.colorScheme.secondary),
                         ),
                         const Text('Pet vacinado'),
                       ],
@@ -217,6 +221,7 @@ class _EditPetPageState extends State<EditPetPage> {
                       hint: 'Ex: São Paulo, Centro',
                       icon: Icons.location_on,
                       validator: Validators.validateLocation,
+                      theme: theme,
                     ),
                     const SizedBox(height: 12),
                     _buildTextField(
@@ -225,6 +230,7 @@ class _EditPetPageState extends State<EditPetPage> {
                       hint: 'Telefone ou email para contato',
                       icon: Icons.phone,
                       validator: Validators.validateContact,
+                      theme: theme,
                     ),
                     const SizedBox(height: 24),
                     SizedBox(
@@ -233,8 +239,8 @@ class _EditPetPageState extends State<EditPetPage> {
                       child: ElevatedButton(
                         onPressed: _loading ? null : _submitForm,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
-                          foregroundColor: Colors.white,
+                          backgroundColor: theme.primaryColor,
+                          foregroundColor: theme.colorScheme.onPrimary,
                         ),
                         child: const Text('SALVAR ALTERAÇÕES'),
                       ),
@@ -253,6 +259,7 @@ class _EditPetPageState extends State<EditPetPage> {
     required IconData icon,
     int maxLines = 1,
     String? Function(String?)? validator,
+    required ThemeData theme,
   }) {
     return TextFormField(
       controller: controller,
@@ -261,8 +268,14 @@ class _EditPetPageState extends State<EditPetPage> {
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
-        prefixIcon: Icon(icon),
+        prefixIcon: Icon(icon, color: theme.colorScheme.secondary),
+        filled: true,
+        fillColor: theme.cardColor,
         border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: theme.primaryColor, width: 2),
           borderRadius: BorderRadius.circular(12),
         ),
       ),

@@ -39,12 +39,12 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  void _toggleEdit() {
+  void _toggleEdit() => setState(() => _isEditing = !_isEditing);
+
+  void _cancelEdit() {
     setState(() {
-      _isEditing = !_isEditing;
-      if (!_isEditing) {
-        _loadUserData(); // Recarrega dados originais ao cancelar
-      }
+      _isEditing = false;
+      _loadUserData();
     });
   }
 
@@ -71,36 +71,26 @@ class _ProfilePageState extends State<ProfilePage> {
         final success = await authProvider.updateProfile(updatedUser);
 
         if (success && mounted) {
-          setState(() {
-            _isEditing = false;
-          });
-
+          setState(() => _isEditing = false);
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Perfil atualizado com sucesso!'),
-              backgroundColor: Colors.green,
+            SnackBar(
+              content: const Text('Perfil atualizado com sucesso!'),
+              backgroundColor: Theme.of(context).primaryColor,
+              behavior: SnackBarBehavior.floating,
             ),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Erro: ${authProvider.error}'),
-              backgroundColor: Colors.red,
+              backgroundColor: Colors.redAccent,
+              behavior: SnackBarBehavior.floating,
             ),
           );
         }
       }
     }
   }
-
-  void _cancelEdit() {
-    setState(() {
-      _isEditing = false;
-      _loadUserData(); // Volta aos dados originais
-    });
-  }
-
-  // ❌ MÉTODO _showLogoutDialog REMOVIDO
 
   @override
   void dispose() {
@@ -114,6 +104,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Consumer<AuthProvider>(
       builder: (context, authProvider, child) {
         final user = authProvider.currentUser;
@@ -131,30 +123,14 @@ class _ProfilePageState extends State<ProfilePage> {
           );
         }
 
-        if (user == null) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.error_outline, size: 64, color: Colors.red),
-                const SizedBox(height: 16),
-                const Text('Usuário não encontrado'),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () =>
-                      Navigator.pushReplacementNamed(context, '/login'),
-                  child: const Text('Fazer Login'),
-                ),
-              ],
-            ),
-          );
-        }
+        if (user == null) return _buildUserNotFound(theme);
 
         return Scaffold(
+          backgroundColor: theme.scaffoldBackgroundColor,
           appBar: AppBar(
             title: const Text('Meu Perfil'),
-            backgroundColor: Colors.purple,
-            foregroundColor: Colors.white,
+            backgroundColor: theme.primaryColor,
+            foregroundColor: theme.colorScheme.onPrimary,
             actions: [
               if (!_isEditing)
                 IconButton(
@@ -170,135 +146,9 @@ class _ProfilePageState extends State<ProfilePage> {
               key: _formKey,
               child: Column(
                 children: [
-                  // Foto e informações do usuário
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Column(
-                        children: [
-                          const CircleAvatar(
-                            radius: 50,
-                            backgroundColor: Colors.purple,
-                            child: Icon(Icons.person,
-                                size: 50, color: Colors.white),
-                          ),
-                          const SizedBox(height: 16),
-
-                          if (!_isEditing) ...[
-                            Text(
-                              user.name,
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              user.email,
-                              style: const TextStyle(color: Colors.grey),
-                            ),
-                            if (user.location != null) ...[
-                              const SizedBox(height: 4),
-                              Text(
-                                user.location!,
-                                style: const TextStyle(color: Colors.grey),
-                              ),
-                            ],
-                            if (user.bio != null && user.bio!.isNotEmpty) ...[
-                              const SizedBox(height: 8),
-                              Text(
-                                user.bio!,
-                                style: const TextStyle(
-                                  color: Colors.grey,
-                                  fontStyle: FontStyle.italic,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
-                            const SizedBox(height: 16),
-                          ],
-
-                          // Botões de ação
-                          if (_isEditing) ...[
-                            _buildEditForm(),
-                            const SizedBox(height: 16),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: OutlinedButton(
-                                    onPressed: _cancelEdit,
-                                    child: const Text('Cancelar'),
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: ElevatedButton(
-                                    onPressed: _saveProfile,
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.purple,
-                                      foregroundColor: Colors.white,
-                                    ),
-                                    child: const Text('Salvar'),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ] else ...[
-                            ElevatedButton(
-                              onPressed: _toggleEdit,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.purple,
-                                foregroundColor: Colors.white,
-                              ),
-                              child: const Text('Editar Perfil'),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                  ),
+                  _buildProfileHeader(user, theme),
                   const SizedBox(height: 20),
-
-                  // Estatísticas (só mostra quando não está editando)
-                  if (!_isEditing) ...[
-                    const Card(
-                      child: Padding(
-                        padding: EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Minhas Estatísticas',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            SizedBox(height: 16),
-                            _StatItem(
-                                icon: Icons.pets,
-                                label: 'Pets Cadastrados',
-                                value: '3'),
-                            _StatItem(
-                                icon: Icons.favorite,
-                                label: 'Pets Adotados',
-                                value: '1'),
-                            _StatItem(
-                                icon: Icons.thumb_up,
-                                label: 'Avaliações',
-                                value: '4.8'),
-                            _StatItem(
-                                icon: Icons.calendar_today,
-                                label: 'Membro desde',
-                                value: 'Jan 2024'),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-
-                    // ❌ BOTÃO "SAIR DA CONTA" REMOVIDO AQUI
-                  ],
+                  if (!_isEditing) _buildStatsCard(theme),
                 ],
               ),
             ),
@@ -308,7 +158,115 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildEditForm() {
+  Widget _buildUserNotFound(ThemeData theme) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.error_outline, size: 64, color: Colors.red),
+          const SizedBox(height: 16),
+          const Text('Usuário não encontrado'),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () => Navigator.pushReplacementNamed(context, '/login'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: theme.primaryColor,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Fazer Login'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProfileHeader(user, ThemeData theme) {
+    final textColor = theme.textTheme.bodyLarge?.color ?? Colors.brown.shade700;
+
+    return Card(
+      color: theme.cardColor,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      elevation: 3,
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          children: [
+            CircleAvatar(
+              radius: 50,
+              backgroundColor: theme.primaryColor,
+              child: const Icon(Icons.person, size: 50, color: Colors.white),
+            ),
+            const SizedBox(height: 16),
+            if (!_isEditing) ...[
+              Text(
+                user.name,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: textColor,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(user.email,
+                  style: TextStyle(color: textColor.withOpacity(0.7))),
+              if (user.location != null) ...[
+                const SizedBox(height: 4),
+                Text(user.location!,
+                    style: TextStyle(color: textColor.withOpacity(0.7))),
+              ],
+              if (user.bio != null && user.bio!.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Text(
+                  user.bio!,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: textColor, fontStyle: FontStyle.italic),
+                ),
+              ],
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: _toggleEdit,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.primaryColor,
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text('Editar Perfil'),
+              ),
+            ],
+            if (_isEditing) ...[
+              _buildEditForm(theme),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: _cancelEdit,
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: textColor,
+                      ),
+                      child: const Text('Cancelar'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: _saveProfile,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: theme.primaryColor,
+                        foregroundColor: Colors.white,
+                      ),
+                      child: const Text('Salvar'),
+                    ),
+                  ),
+                ],
+              ),
+            ]
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEditForm(ThemeData theme) {
     return Column(
       children: [
         _buildTextField(
@@ -318,6 +276,7 @@ class _ProfilePageState extends State<ProfilePage> {
           icon: Icons.person,
           validator: (value) =>
               Validators.validateName(value, fieldName: 'Nome'),
+          theme: theme,
         ),
         const SizedBox(height: 12),
         _buildTextField(
@@ -325,7 +284,8 @@ class _ProfilePageState extends State<ProfilePage> {
           label: 'E-mail',
           hint: 'Digite seu e-mail',
           icon: Icons.email,
-          enabled: false, // Email não pode ser editado
+          enabled: false,
+          theme: theme,
         ),
         const SizedBox(height: 12),
         _buildTextField(
@@ -334,6 +294,7 @@ class _ProfilePageState extends State<ProfilePage> {
           hint: '(11) 99999-9999',
           icon: Icons.phone,
           validator: Validators.validatePhone,
+          theme: theme,
         ),
         const SizedBox(height: 12),
         _buildTextField(
@@ -342,6 +303,7 @@ class _ProfilePageState extends State<ProfilePage> {
           hint: 'Cidade, Estado',
           icon: Icons.location_on,
           validator: Validators.validateLocation,
+          theme: theme,
         ),
         const SizedBox(height: 12),
         _buildTextField(
@@ -351,6 +313,7 @@ class _ProfilePageState extends State<ProfilePage> {
           icon: Icons.description,
           maxLines: 3,
           validator: Validators.validateBio,
+          theme: theme,
         ),
       ],
     );
@@ -364,6 +327,7 @@ class _ProfilePageState extends State<ProfilePage> {
     String? Function(String?)? validator,
     int maxLines = 1,
     bool enabled = true,
+    required ThemeData theme,
   }) {
     return TextFormField(
       controller: controller,
@@ -373,9 +337,43 @@ class _ProfilePageState extends State<ProfilePage> {
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
-        prefixIcon: Icon(icon),
+        prefixIcon: Icon(icon, color: theme.primaryColor),
+        filled: true,
+        fillColor: theme.cardColor,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: theme.primaryColor, width: 2),
+        ),
+      ),
+      style: TextStyle(color: theme.textTheme.bodyLarge?.color),
+    );
+  }
+
+  Widget _buildStatsCard(ThemeData theme) {
+    final textColor = theme.textTheme.bodyLarge?.color ?? Colors.brown.shade700;
+
+    return Card(
+      color: theme.cardColor,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      elevation: 3,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Text(
+              'Minhas Estatísticas',
+              style: TextStyle(
+                  fontSize: 18, fontWeight: FontWeight.bold, color: textColor),
+            ),
+            const SizedBox(height: 16),
+            _StatItem(icon: Icons.pets, label: 'Pets Cadastrados', value: '3', theme: theme),
+            _StatItem(icon: Icons.favorite, label: 'Pets Adotados', value: '1', theme: theme),
+            _StatItem(icon: Icons.thumb_up, label: 'Avaliações', value: '4.8', theme: theme),
+            _StatItem(icon: Icons.calendar_today, label: 'Membro desde', value: 'Jan 2024', theme: theme),
+          ],
         ),
       ),
     );
@@ -386,26 +384,27 @@ class _StatItem extends StatelessWidget {
   final IconData icon;
   final String label;
   final String value;
+  final ThemeData theme;
 
   const _StatItem({
     required this.icon,
     required this.label,
     required this.value,
+    required this.theme,
   });
 
   @override
   Widget build(BuildContext context) {
+    final textColor = theme.textTheme.bodyLarge?.color ?? Colors.brown.shade700;
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
         children: [
-          Icon(icon, color: Colors.purple),
+          Icon(icon, color: theme.primaryColor),
           const SizedBox(width: 12),
-          Expanded(child: Text(label)),
-          Text(
-            value,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
+          Expanded(child: Text(label, style: TextStyle(color: textColor))),
+          Text(value, style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
         ],
       ),
     );

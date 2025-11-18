@@ -12,7 +12,7 @@ class AppConstants {
   static const String firstTimeKey = 'first_time';
 
   // App Information
-  static const String appName = 'AdotePet';
+  static const String appName = 'AdotaJá';
   static const String appVersion = '1.0.0';
 
   // Design System

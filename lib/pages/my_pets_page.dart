@@ -3,11 +3,10 @@ import 'package:provider/provider.dart';
 import 'package:app_projetoyuri/providers/pet_provider.dart';
 import 'package:app_projetoyuri/models/pet_model.dart';
 import 'package:app_projetoyuri/pages/pet_detail_page.dart';
-import 'package:app_projetoyuri/utils/constants.dart';
 import 'package:app_projetoyuri/pages/add_pet_page.dart';
-import 'package:app_projetoyuri/pages/edit_pet_page.dart'; // ✅ IMPORT ADICIONADO
+import 'package:app_projetoyuri/pages/edit_pet_page.dart';
+import 'package:app_projetoyuri/utils/constants.dart';
 
-// ✅ MUDE para StatefulWidget
 class MyPetsPage extends StatefulWidget {
   const MyPetsPage({super.key});
 
@@ -16,13 +15,11 @@ class MyPetsPage extends StatefulWidget {
 }
 
 class _MyPetsPageState extends State<MyPetsPage> {
-  // ✅ ADICIONE: Recarrega os pets quando a página abre
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        print('🔄 INICIANDO MEUS PETS - Carregando dados...');
         context.read<PetProvider>().loadMyPets();
       }
     });
@@ -30,24 +27,25 @@ class _MyPetsPageState extends State<MyPetsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('Meus Pets'),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
+        backgroundColor: theme.primaryColor,
+        foregroundColor: theme.colorScheme.onPrimary,
       ),
       body: Consumer<PetProvider>(
         builder: (context, petProvider, child) {
-          print('🏠 MY PETS PAGE - Total: ${petProvider.myPets.length}');
-
           if (petProvider.loading && petProvider.myPets.isEmpty) {
-            return const Center(
+            return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 16),
-                  Text('Carregando meus pets...'),
+                  CircularProgressIndicator(color: theme.primaryColor),
+                  const SizedBox(height: 16),
+                  const Text('Carregando meus pets...'),
                 ],
               ),
             );
@@ -58,26 +56,28 @@ class _MyPetsPageState extends State<MyPetsPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.pets, size: 64, color: Colors.grey),
+                  Icon(Icons.pets, size: 64, color: Colors.grey[500]),
                   const SizedBox(height: 16),
-                  const Text(
+                  Text(
                     'Você ainda não cadastrou nenhum pet',
-                    style: TextStyle(fontSize: 18, color: Colors.grey),
+                    style: TextStyle(fontSize: 18, color: Colors.grey[700]),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
+                  Text(
                     'Clique no botão + para adicionar seu primeiro pet',
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.grey),
+                    style: TextStyle(color: Colors.grey[600]),
                   ),
                   const SizedBox(height: 24),
                   ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: theme.primaryColor,
+                      foregroundColor: theme.colorScheme.onPrimary,
+                    ),
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) => const AddPetPage(),
-                        ),
+                        MaterialPageRoute(builder: (context) => const AddPetPage()),
                       );
                     },
                     child: const Text('Cadastrar Primeiro Pet'),
@@ -88,7 +88,7 @@ class _MyPetsPageState extends State<MyPetsPage> {
           }
 
           return RefreshIndicator(
-            // ✅ RECARREGA quando puxar para baixo
+            color: theme.primaryColor,
             onRefresh: () => petProvider.loadMyPets(),
             child: ListView.builder(
               itemCount: petProvider.myPets.length,
@@ -104,41 +104,39 @@ class _MyPetsPageState extends State<MyPetsPage> {
   }
 }
 
+// -------------------------------------------------------
+// CARD DOS PETS
+// -------------------------------------------------------
 class _MyPetCard extends StatelessWidget {
   final Pet pet;
-
   const _MyPetCard({required this.pet});
 
   void _navigateToPetDetail(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => PetDetailPage(pet: pet),
-      ),
+      MaterialPageRoute(builder: (context) => PetDetailPage(pet: pet)),
     );
   }
 
-  // ✅ ATUALIZADO: Navegar para edição
   void _navigateToEditPet(BuildContext context) async {
     final result = await Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => EditPetPage(pet: pet), // ✅ AGORA FUNCIONA!
-      ),
+      MaterialPageRoute(builder: (context) => EditPetPage(pet: pet)),
     );
 
-    // Se a edição foi bem sucedida, recarrega os dados
     if (result == true && context.mounted) {
       context.read<PetProvider>().loadMyPets();
     }
   }
 
-  // ✅ ATUALIZADO: Diálogo de deletar
   void _showDeleteDialog(BuildContext context) {
+    final theme = Theme.of(context);
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: theme.scaffoldBackgroundColor,
           title: const Text('Remover Pet'),
           content: Text('Tem certeza que deseja remover ${pet.name}?'),
           actions: [
@@ -160,17 +158,15 @@ class _MyPetCard extends StatelessWidget {
     );
   }
 
-  // ✅ ATUALIZADO: Deletar pet
   Future<void> _deletePet(BuildContext context) async {
     final petProvider = context.read<PetProvider>();
-
     try {
       final success = await petProvider.removePet(pet.id);
 
       if (success && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('${pet.name} removido com sucesso!'),
+          const SnackBar(
+            content: Text('Pet removido com sucesso!'),
             backgroundColor: Colors.green,
           ),
         );
@@ -196,7 +192,10 @@ class _MyPetCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Card(
+      color: theme.cardColor,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       elevation: AppConstants.cardElevation,
       shape: RoundedRectangleBorder(
@@ -209,12 +208,12 @@ class _MyPetCard extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           child: Row(
             children: [
-              // Foto do pet
+              // Foto
               Container(
                 width: 80,
                 height: 80,
                 decoration: BoxDecoration(
-                  color: Colors.grey[200],
+                  color: theme.primaryColor.withOpacity(0.3),
                   borderRadius: BorderRadius.circular(12),
                   image: pet.photos.isNotEmpty
                       ? DecorationImage(
@@ -224,55 +223,47 @@ class _MyPetCard extends StatelessWidget {
                       : null,
                 ),
                 child: pet.photos.isEmpty
-                    ? const Icon(Icons.pets, size: 40, color: Colors.grey)
+                    ? Icon(Icons.pets, size: 40, color: Colors.grey[600])
                     : null,
               ),
+
               const SizedBox(width: 16),
 
-              // Informações do pet
+              // Informações
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       pet.name,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
+                        color: theme.primaryColor,
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      '${pet.species} • ${pet.breed}',
-                      style: const TextStyle(
-                        color: Colors.grey,
-                      ),
-                    ),
+                    Text('${pet.species} • ${pet.breed}',
+                        style: TextStyle(color: Colors.grey[700])),
                     const SizedBox(height: 4),
-                    Text(
-                      pet.age,
-                      style: const TextStyle(
-                        color: Colors.blue,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
+                    Text(pet.age,
+                        style: TextStyle(
+                          color: theme.primaryColor,
+                          fontWeight: FontWeight.w500,
+                        )),
                     const SizedBox(height: 4),
-                    Text(
-                      pet.location,
-                      style: const TextStyle(
-                        color: Colors.grey,
-                        fontSize: 12,
-                      ),
-                    ),
+                    Text(pet.location,
+                        style: TextStyle(color: Colors.grey[600], fontSize: 12)),
                   ],
                 ),
               ),
 
-              // Botões de ação
+              // Menu
               PopupMenuButton<String>(
+                color: theme.scaffoldBackgroundColor,
                 onSelected: (value) {
                   if (value == 'edit') {
-                    _navigateToEditPet(context); // ✅ AGORA FUNCIONA!
+                    _navigateToEditPet(context);
                   } else if (value == 'delete') {
                     _showDeleteDialog(context);
                   }
