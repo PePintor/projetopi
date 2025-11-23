@@ -23,7 +23,7 @@ final lightTheme = ThemeData(
     unselectedItemColor: Colors.grey,
   ),
   cardColor: const Color(0xFFFFF8E6),
-  colorScheme: ColorScheme.light(
+  colorScheme: const ColorScheme.light(
     primary: Color(0xFFFFB84D),
     onPrimary: Colors.white,
     secondary: Color(0xFFFF8A00),
