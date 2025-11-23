@@ -5,18 +5,18 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 // 📂 PÁGINAS
-import 'package:app_projetoyuri/pages/add_pet_page.dart';      // ➕ Tela de cadastro
-import 'package:app_projetoyuri/pages/my_pets_page.dart';     // 🐾 Meus pets
-import 'package:app_projetoyuri/pages/profile_page.dart';     // 👤 Perfil
-import 'package:app_projetoyuri/pages/settings_page.dart';    // ⚙️ Configurações
-import 'package:app_projetoyuri/pages/pet_detail_page.dart';  // 📋 Detalhes do pet
+import 'package:app_projetoyuri/pages/add_pet_page.dart'; // ➕ Tela de cadastro
+import 'package:app_projetoyuri/pages/my_pets_page.dart'; // 🐾 Meus pets
+import 'package:app_projetoyuri/pages/profile_page.dart'; // 👤 Perfil
+import 'package:app_projetoyuri/pages/settings_page.dart'; // ⚙️ Configurações
+import 'package:app_projetoyuri/pages/pet_detail_page.dart'; // 📋 Detalhes do pet
 
 // 📂 MODELOS E PROVIDERS
-import 'package:app_projetoyuri/models/pet_model.dart';       // 🎯 Modelo de dados
+import 'package:app_projetoyuri/models/pet_model.dart'; // 🎯 Modelo de dados
 import 'package:app_projetoyuri/providers/pet_provider.dart'; // 🐾 Provider de pets
 
 // 📂 UTILITÁRIOS
-import 'package:app_projetoyuri/utils/constants.dart';        // 📏 Constantes do app
+import 'package:app_projetoyuri/utils/constants.dart'; // 📏 Constantes do app
 
 // 🏠 HOME PAGE PRINCIPAL
 class HomePage extends StatefulWidget {
@@ -86,15 +86,15 @@ class _HomePageState extends State<HomePage> {
   Widget _getCurrentPage() {
     switch (_selectedIndex) {
       case 0:
-        return const _HomeContent();       // 🏠 Conteúdo principal
+        return const _HomeContent(); // 🏠 Conteúdo principal
       case 1:
-        return const MyPetsPage();   // 🐾 Meus pets
+        return const MyPetsPage(); // 🐾 Meus pets
       case 3:
-        return const ProfilePage();  // 👤 Perfil
+        return const ProfilePage(); // 👤 Perfil
       case 4:
         return const SettingsPage(); // ⚙️ Configurações
       default:
-        return const _HomeContent();       // 🏠 Fallback
+        return const _HomeContent(); // 🏠 Fallback
     }
   }
 
@@ -124,7 +124,8 @@ class _HomePageState extends State<HomePage> {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.pets), label: 'Meus Pets'),
-          BottomNavigationBarItem(icon: Icon(Icons.add_circle), label: 'Adicionar'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.add_circle), label: 'Adicionar'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
           BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Config'),
         ],
@@ -188,9 +189,13 @@ class _HomeContentState extends State<_HomeContent> {
               children: [
                 Icon(Icons.error, size: 64, color: theme.colorScheme.error),
                 const SizedBox(height: 16),
-                Text('Erro ao carregar pets', style: TextStyle(fontSize: 18, color: theme.colorScheme.error)),
+                Text('Erro ao carregar pets',
+                    style: TextStyle(
+                        fontSize: 18, color: theme.colorScheme.error)),
                 const SizedBox(height: 8),
-                Text(petProvider.error, textAlign: TextAlign.center, style: TextStyle(color: theme.textTheme.bodyMedium?.color)),
+                Text(petProvider.error,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: theme.textTheme.bodyMedium?.color)),
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () => petProvider.loadPets(),
@@ -222,11 +227,14 @@ class _HomeContentState extends State<_HomeContent> {
                     },
                     decoration: InputDecoration(
                       hintText: '🔍 Pesquisar pets...',
-                      helperText: 'Busque por nome, raça, espécie, localização, idade ou descrição',
+                      helperText:
+                          'Busque por nome, raça, espécie, localização, idade ou descrição',
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(AppConstants.defaultBorderRadius),
+                        borderRadius: BorderRadius.circular(
+                            AppConstants.defaultBorderRadius),
                       ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 15),
                       suffixIcon: _searchQuery.isNotEmpty
                           ? IconButton(
                               icon: const Icon(Icons.clear),
@@ -262,7 +270,8 @@ class _HomeContentState extends State<_HomeContent> {
             // 📜 Resultados da busca
             if (_searchQuery.isNotEmpty)
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppConstants.defaultPadding),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: AppConstants.defaultPadding),
                 child: Row(
                   children: [
                     Text(
@@ -287,7 +296,8 @@ class _HomeContentState extends State<_HomeContent> {
                         itemCount: displayedPets.length,
                         itemBuilder: (context, index) {
                           final pet = displayedPets[index];
-                          return _PetCard(pet: pet, theme: theme); // 🎴 Card do pet
+                          return _PetCard(
+                              pet: pet, theme: theme); // 🎴 Card do pet
                         },
                       ),
               ),
@@ -345,7 +355,9 @@ class _HomeContentState extends State<_HomeContent> {
           ),
           const SizedBox(height: 8),
           Text(
-            query.isEmpty ? 'Clique em + para adicionar um pet' : 'Tente buscar por outro termo',
+            query.isEmpty
+                ? 'Clique em + para adicionar um pet'
+                : 'Tente buscar por outro termo',
             style: TextStyle(
               color: theme.textTheme.bodySmall?.color,
               fontSize: AppConstants.captionFontSize,
@@ -383,41 +395,50 @@ class __PetCardState extends State<_PetCard> {
   Widget build(BuildContext context) {
     final theme = widget.theme;
 
+//GestureDetector 
     return GestureDetector(
-      onTap: () {
-        setState(() {
-          // ignore: deprecated_member_use
-          _cardColor = theme.cardColor.withOpacity(0.5); // 🎯 Destaque ao tocar
-        });
-        _navigateToPetDetail(context);
-      },
+onTap: () {
+  setState(() {
+    _cardColor = _cardColor == null
+        ? const Color(0xFFFFF8E1) // branco creme
+        : null; // volta à cor normal
+  });
+
+  _navigateToPetDetail(context);
+},
       child: Card(
-        margin: const EdgeInsets.symmetric(horizontal: AppConstants.defaultPadding, vertical: 8),
+        margin: const EdgeInsets.symmetric(
+            horizontal: AppConstants.defaultPadding, vertical: 8),
         elevation: AppConstants.cardElevation,
         color: _cardColor ?? theme.cardColor,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppConstants.defaultBorderRadius)),
+        shape: RoundedRectangleBorder(
+            borderRadius:
+                BorderRadius.circular(AppConstants.defaultBorderRadius)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 🖼️ Imagem do pet
             ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(AppConstants.defaultBorderRadius)),
-              child: Container(
-                height: 200,
-                width: double.infinity,
-                color: theme.dividerColor,
-                child: widget.pet.photos.isNotEmpty
-                    ? Image.network(
-                        widget.pet.photos.first,
-                        height: 200,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return _buildPlaceholderImage(theme);
-                        },
-                      )
-                    : _buildPlaceholderImage(theme),
-              ),
+              borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(AppConstants.defaultBorderRadius)),
+              child: widget.pet.photos.isNotEmpty
+                  ? Image.network(
+                      widget.pet.photos.first,
+                      height: 200,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return _buildPlaceholderImage(
+                            theme); // Placeholder em caso de erro
+                      },
+                    )
+                  : Container(
+                      height: 200,
+                      width: double.infinity,
+                      color: Colors.grey[200], // cor clara de fundo
+                      child: _buildPlaceholderImage(
+                          theme), // Placeholder quando não há foto
+                    ),
             ),
 
             // 📋 Informações do pet
@@ -427,9 +448,14 @@ class __PetCardState extends State<_PetCard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(widget.pet.name,
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: theme.textTheme.bodyLarge?.color)),
+                      style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: theme.textTheme.bodyLarge?.color)),
                   const SizedBox(height: 4),
-                  Text('${widget.pet.species} • ${widget.pet.breed}', style: TextStyle(color: theme.textTheme.bodyMedium?.color)),
+                  Text('${widget.pet.species} • ${widget.pet.breed}',
+                      style:
+                          TextStyle(color: theme.textTheme.bodyMedium?.color)),
                 ],
               ),
             ),

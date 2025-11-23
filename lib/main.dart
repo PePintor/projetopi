@@ -47,7 +47,7 @@ final darkTheme = ThemeData(
     unselectedItemColor: Colors.grey,
   ),
   cardColor: const Color(0xFF3C3C3C),
-  colorScheme: ColorScheme.dark(
+  colorScheme: const ColorScheme.dark(
     primary: Color(0xFFFFB84D),
     onPrimary: Colors.white,
     secondary: Color(0xFFFF8A00),
