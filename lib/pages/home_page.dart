@@ -398,12 +398,12 @@ class __PetCardState extends State<_PetCard> {
 //GestureDetector 
     return GestureDetector(
 onTap: () {
-  setState(() {
-    _cardColor = _cardColor == null
-        // ignore: deprecated_member_use
-        ? const Color(0xFFFFF8E1)  // cor destacada
-        : null; // volta à cor normal
-  });
+  // setState(() {
+  //   _cardColor = _cardColor == null
+  //       // ignore: deprecated_member_use
+  //       ? const Color(0xFFFFF8E1)
+  //       : null; // volta à cor normal
+  // });
 
   // Navegação para detalhes do pet
   _navigateToPetDetail(context);

@@ -196,6 +196,22 @@ class PetProvider with ChangeNotifier {
   }
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // counter
 // Criar display_page.dart:
 
@@ -227,7 +243,7 @@ class PetProvider with ChangeNotifier {
 
 // Criar o increment_page.dart:
 
-// lib/pages/ increment_page.dart
+// lib/pages/increment_page.dart
 
 // import 'package:flutter/material.dart';
 // import 'package:app_projetoyuri/providers/counter_notifier.dart';
@@ -260,7 +276,7 @@ class PetProvider with ChangeNotifier {
 
 // Crie o counter_notifier.dart:
 
-// Lib/providers counter_notifier.dart
+// Lib/providers/counter_notifier.dart
 // import 'package:flutter/material.dart';
 
 // class CounterController {

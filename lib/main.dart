@@ -8,6 +8,7 @@ import 'package:app_projetoyuri/providers/theme_provider.dart';
 import 'package:app_projetoyuri/providers/pet_provider.dart';
 import 'package:app_projetoyuri/providers/auth_provider.dart';
 
+
 // 🔹 Temas personalizados
 final lightTheme = ThemeData(
   brightness: Brightness.light,
@@ -96,6 +97,20 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //Criar uma tela com Slider e RadioListTile, exibindo os valores abaixo em Text.
 
