@@ -1,3 +1,4 @@
+import 'dart:convert'; // ✅ IMPORT ADICIONADO
 import 'package:flutter/material.dart';
 import 'package:app_projetoyuri/models/pet_model.dart';
 
@@ -28,28 +29,22 @@ class PetDetailPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Fotos do pet
+            // Fotos do pet - ✅ CORRIGIDO
             Container(
               height: 200,
               decoration: BoxDecoration(
                 color: primaryColor.withOpacity(0.3),
                 borderRadius: BorderRadius.circular(12),
-                image: pet.photos.isNotEmpty
-                    ? DecorationImage(
-                        image: NetworkImage(pet.photos.first),
-                        fit: BoxFit.cover,
-                      )
-                    : null,
               ),
-              child: pet.photos.isEmpty
-                  ? Center(
+              child: pet.photos.isNotEmpty
+                  ? _buildPetImage(pet.photos.first, darkText) // ✅ NOVO MÉTODO
+                  : Center(
                       child: Icon(
                         Icons.pets,
                         size: 64,
                         color: darkText,
                       ),
-                    )
-                  : null,
+                    ),
             ),
             const SizedBox(height: 20),
 
@@ -165,6 +160,56 @@ class PetDetailPage extends StatelessWidget {
               style: TextStyle(color: color),
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  // ✅ NOVO MÉTODO: Processa imagens Base64 ou URL
+  Widget _buildPetImage(String imageData, Color darkText) {
+    try {
+      if (imageData.startsWith('data:image')) {
+        // É Base64 - converter para bytes
+        final base64String = imageData.split(',').last;
+        final bytes = base64Decode(base64String);
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Image.memory(
+            bytes,
+            height: 200,
+            width: double.infinity,
+            fit: BoxFit.cover,
+          ),
+        );
+      } else {
+        // É URL normal
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Image.network(
+            imageData,
+            height: 200,
+            width: double.infinity,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) {
+              return _buildPlaceholderImage(darkText);
+            },
+          ),
+        );
+      }
+    } catch (e) {
+      return _buildPlaceholderImage(darkText);
+    }
+  }
+
+  // ✅ MÉTODO AUXILIAR: Placeholder para erro
+  Widget _buildPlaceholderImage(Color darkText) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.pets, size: 64, color: darkText),
+          const SizedBox(height: 8),
+          Text('Erro ao carregar imagem', style: TextStyle(color: darkText)),
         ],
       ),
     );

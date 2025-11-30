@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'dart:convert'; // ✅ ADICIONAR ESTE IMPORT
 
 // 📂 PÁGINAS
 import 'package:app_projetoyuri/pages/add_pet_page.dart'; // Tela de cadastro
@@ -381,7 +382,6 @@ class _PetCard extends StatefulWidget {
 class __PetCardState extends State<_PetCard> {
   Color? _cardColor;
 
-  // Navega para detalhes do pet
   void _navigateToPetDetail(BuildContext context) {
     Navigator.push(
       context,
@@ -389,23 +389,45 @@ class __PetCardState extends State<_PetCard> {
     );
   }
 
+  // ✅ NOVO MÉTODO: Processa imagens Base64 ou URL
+  Widget _buildPetImage(String imageData) {
+    try {
+      if (imageData.startsWith('data:image')) {
+        // É Base64 - converter para bytes
+        final base64String = imageData.split(',').last;
+        final bytes = base64Decode(base64String);
+        return Image.memory(
+          bytes,
+          height: 200,
+          width: double.infinity,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return _buildPlaceholderImage(widget.theme);
+          },
+        );
+      } else {
+        // É URL normal
+        return Image.network(
+          imageData,
+          height: 200,
+          width: double.infinity,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return _buildPlaceholderImage(widget.theme);
+          },
+        );
+      }
+    } catch (e) {
+      return _buildPlaceholderImage(widget.theme);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = widget.theme;
 
-//GestureDetector 
     return GestureDetector(
-onTap: () {
-  // setState(() {
-  //   _cardColor = _cardColor == null
-  //       // ignore: deprecated_member_use
-  //       ? const Color(0xFFFFF8E1)
-  //       : null; // volta à cor normal
-  // });
-
-  // Navegação para detalhes do pet
-  _navigateToPetDetail(context);
-},
+      onTap: () => _navigateToPetDetail(context),
       child: Card(
         margin: const EdgeInsets.symmetric(
             horizontal: AppConstants.defaultPadding, vertical: 8),
@@ -417,31 +439,15 @@ onTap: () {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Imagem do pet
+            // ✅ CORREÇÃO APLICADA: Usa o novo método de imagem
             ClipRRect(
               borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(AppConstants.defaultBorderRadius)),
               child: widget.pet.photos.isNotEmpty
-                  ? Image.network(
-                      widget.pet.photos.first,
-                      height: 200,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return _buildPlaceholderImage(
-                            theme); // Placeholder em caso de erro
-                      },
-                    )
-                  : Container(
-                      height: 200,
-                      width: double.infinity,
-                      color: Colors.grey[200], // cor clara de fundo
-                      child: _buildPlaceholderImage(
-                          theme), // Placeholder quando não há foto
-                    ),
+                  ? _buildPetImage(widget.pet.photos.first)
+                  : _buildPlaceholderImage(theme),
             ),
 
-            // 📋 Informações do pet
             Padding(
               padding: const EdgeInsets.all(AppConstants.defaultPadding),
               child: Column(
@@ -465,15 +471,19 @@ onTap: () {
     );
   }
 
-  // Placeholder para pets sem foto
   Widget _buildPlaceholderImage(ThemeData theme) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(Icons.pets, size: 50, color: theme.disabledColor),
-        const SizedBox(height: 8),
-        Text('Sem foto', style: TextStyle(color: theme.disabledColor)),
-      ],
+    return Container(
+      height: 200,
+      width: double.infinity,
+      color: Colors.grey[200],
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.pets, size: 50, color: theme.disabledColor),
+          const SizedBox(height: 8),
+          Text('Sem foto', style: TextStyle(color: theme.disabledColor)),
+        ],
+      ),
     );
   }
 }

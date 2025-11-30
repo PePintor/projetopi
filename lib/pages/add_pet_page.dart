@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:app_projetoyuri/providers/pet_provider.dart';
@@ -61,7 +62,7 @@ class _AddPetPageState extends State<AddPetPage> {
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        backgroundColor: Theme.of(context).colorScheme.secondary,
+        backgroundColor: Colors.red,
         content: Text(message),
         duration: const Duration(seconds: 4),
       ),
@@ -71,7 +72,6 @@ class _AddPetPageState extends State<AddPetPage> {
   void _showMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        backgroundColor: Theme.of(context).cardColor,
         content: Text(message),
         duration: const Duration(seconds: 2),
       ),
@@ -81,7 +81,7 @@ class _AddPetPageState extends State<AddPetPage> {
   void _showSuccess() {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        backgroundColor: Theme.of(context).primaryColor,
+        backgroundColor: Colors.green,
         content: const Text(
           'Pet cadastrado com sucesso!',
           style: TextStyle(color: Colors.white),
@@ -102,56 +102,65 @@ class _AddPetPageState extends State<AddPetPage> {
     return false;
   }
 
-  void _submitForm() async {
-    if (!_validateForm()) return;
+ void _submitForm() async {
+  if (!_validateForm()) return;
 
-    setState(() => _loading = true);
+  setState(() => _loading = true);
+
+  try {
+    // ✅ SOLUÇÃO: URLs FICTÍCIAS (funciona com MockAPI)
+  // ✅ CORREÇÃO: URLs completas sem cortes
+final List<String> photoUrls = List.generate(_selectedImages.length, (index) {
+  final timestamp = DateTime.now().millisecondsSinceEpoch + index;
+  return 'https://picsum.photos/400/300?random=$timestamp';
+});
+
+    final pet = Pet(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      name: _nameController.text,
+      species: _speciesController.text,
+      breed: _breedController.text,
+      age: _ageController.text,
+      description: _descriptionController.text,
+      careInstructions: _careController.text,
+      photos: photoUrls, // ← AGORA COM URLs FICTÍCIAS!
+      vaccinated: _vaccinated,
+      location: _locationController.text,
+      contact: _contactController.text,
+      userId: 'user1',
+      createdAt: DateTime.now(),
+    );
+
+    final success = await context.read<PetProvider>().addPet(pet);
+
+    if (success) {
+      _showSuccess();
+      Navigator.of(context).pop(true);
+    } else {
+      _showError('Erro ao cadastrar pet: ${context.read<PetProvider>().error}');
+    }
+  } catch (e) {
+    _showError('Erro inesperado: $e');
+  } finally {
+    setState(() => _loading = false);
+  }
+}
+  void _resetForm() {
+    // ✅ VERIFICA SE A TELA AINDA ESTÁ ATIVA
+    if (!mounted) return;
 
     try {
-      final pet = Pet(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        name: _nameController.text,
-        species: _speciesController.text,
-        breed: _breedController.text,
-        age: _ageController.text,
-        description: _descriptionController.text,
-        careInstructions: _careController.text,
-        photos: [],
-        vaccinated: _vaccinated,
-        location: _locationController.text,
-        contact: _contactController.text,
-        userId: 'user1',
-        createdAt: DateTime.now(),
-      );
-
-      final success = await context.read<PetProvider>().addPet(pet);
-
-      if (success) {
-        _showSuccess();
-        _resetForm();
-        // ignore: use_build_context_synchronously
-        Navigator.of(context).pop(true);
-      } else {
-        _showError(
-            // ignore: use_build_context_synchronously
-            'Erro ao cadastrar pet: ${context.read<PetProvider>().error}');
-      }
+      _nameController.clear();
+      _speciesController.clear();
+      _breedController.clear();
+      _ageController.clear();
+      _descriptionController.clear();
+      _careController.clear();
+      _locationController.clear();
+      _contactController.clear();
     } catch (e) {
-      _showError('Erro inesperado: $e');
-    } finally {
-      setState(() => _loading = false);
+      // Ignora erros de controllers
     }
-  }
-
-  void _resetForm() {
-    _nameController.clear();
-    _speciesController.clear();
-    _breedController.clear();
-    _ageController.clear();
-    _descriptionController.clear();
-    _careController.clear();
-    _locationController.clear();
-    _contactController.clear();
 
     setState(() {
       _selectedImages = [];
@@ -186,7 +195,7 @@ class _AddPetPageState extends State<AddPetPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.clear),
-            onPressed: _resetForm,
+            onPressed: _loading ? null : _resetForm, // ✅ SEGURO
             tooltip: 'Limpar formulário',
             color: theme.appBarTheme.foregroundColor,
           ),
@@ -230,12 +239,19 @@ class _AddPetPageState extends State<AddPetPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Fotos do Pet*',
-            style: TextStyle(
-                fontSize: 18, fontWeight: FontWeight.bold, color: theme.primaryColor)),
+        Text(
+          'Fotos do Pet*',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: theme.primaryColor,
+          ),
+        ),
         const SizedBox(height: 8),
-        Text('Adicione até 5 fotos (mínimo 1)',
-            style: TextStyle(color: theme.colorScheme.onSurface)),
+        Text(
+          'Adicione até 5 fotos (mínimo 1)',
+          style: TextStyle(color: theme.colorScheme.onSurface),
+        ),
         const SizedBox(height: 12),
         if (_imageLoading)
           Center(
@@ -283,7 +299,10 @@ class _AddPetPageState extends State<AddPetPage> {
             children: [
               Icon(Icons.add_a_photo, size: 30, color: theme.primaryColor),
               const SizedBox(height: 4),
-              Text('Adicionar', style: TextStyle(fontSize: 12, color: theme.primaryColor)),
+              Text(
+                'Adicionar',
+                style: TextStyle(fontSize: 12, color: theme.primaryColor),
+              ),
             ],
           ),
         ),
@@ -296,12 +315,11 @@ class _AddPetPageState extends State<AddPetPage> {
       children: [
         Container(
           decoration: BoxDecoration(
-            color: theme.cardColor,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: theme.primaryColor),
-          ),
-          child: Center(
-            child: Icon(Icons.photo, size: 40, color: theme.primaryColor),
+            image: DecorationImage(
+              image: MemoryImage(_selectedImages[index]),
+              fit: BoxFit.cover,
+            ),
           ),
         ),
         Positioned(
@@ -327,26 +345,63 @@ class _AddPetPageState extends State<AddPetPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Informações Básicas',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: theme.primaryColor)),
+        Text(
+          'Informações Básicas',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: theme.primaryColor,
+          ),
+        ),
         const SizedBox(height: 16),
-        _buildTextField(_nameController, 'Nome do Pet*', 'Ex: Rex, Luna, Thor', Icons.pets, theme),
+        _buildTextField(
+          _nameController,
+          'Nome do Pet*',
+          'Ex: Rex, Luna, Thor',
+          Icons.pets,
+          theme,
+        ),
         const SizedBox(height: 12),
         Row(
           children: [
             Expanded(
-              child: _buildTextField(_speciesController, 'Espécie*', 'Ex: Cachorro, Gato', Icons.category, theme),
+              child: _buildTextField(
+                _speciesController,
+                'Espécie*',
+                'Ex: Cachorro, Gato',
+                Icons.category,
+                theme,
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: _buildTextField(_breedController, 'Raça*', 'Ex: Labrador, Siamês', Icons.emoji_nature, theme),
+              child: _buildTextField(
+                _breedController,
+                'Raça*',
+                'Ex: Labrador, Siamês',
+                Icons.emoji_nature,
+                theme,
+              ),
             ),
           ],
         ),
         const SizedBox(height: 12),
-        _buildTextField(_ageController, 'Idade*', 'Ex: 2 anos, 6 meses', Icons.cake, theme),
+        _buildTextField(
+          _ageController,
+          'Idade*',
+          'Ex: 2 anos, 6 meses',
+          Icons.cake,
+          theme,
+        ),
         const SizedBox(height: 12),
-        _buildTextField(_descriptionController, 'Descrição*', 'Conte um pouco sobre o pet...', Icons.description, theme, maxLines: 3),
+        _buildTextField(
+          _descriptionController,
+          'Descrição*',
+          'Conte um pouco sobre o pet...',
+          Icons.description,
+          theme,
+          maxLines: 3,
+        ),
       ],
     );
   }
@@ -355,8 +410,14 @@ class _AddPetPageState extends State<AddPetPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Cuidados e Saúde',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: theme.primaryColor)),
+        Text(
+          'Cuidados e Saúde',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: theme.primaryColor,
+          ),
+        ),
         const SizedBox(height: 16),
         Row(
           children: [
@@ -369,7 +430,14 @@ class _AddPetPageState extends State<AddPetPage> {
           ],
         ),
         const SizedBox(height: 12),
-        _buildTextField(_careController, 'Cuidados Especiais', 'Alimentação, medicamentos, comportamento...', Icons.medical_services, theme, maxLines: 4),
+        _buildTextField(
+          _careController,
+          'Cuidados Especiais',
+          'Alimentação, medicamentos, comportamento...',
+          Icons.medical_services,
+          theme,
+          maxLines: 4,
+        ),
       ],
     );
   }
@@ -378,17 +446,42 @@ class _AddPetPageState extends State<AddPetPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Localização e Contato',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: theme.primaryColor)),
+        Text(
+          'Localização e Contato',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: theme.primaryColor,
+          ),
+        ),
         const SizedBox(height: 16),
-        _buildTextField(_locationController, 'Localização*', 'Ex: São Paulo, Centro', Icons.location_on, theme),
+        _buildTextField(
+          _locationController,
+          'Localização*',
+          'Ex: São Paulo, Centro',
+          Icons.location_on,
+          theme,
+        ),
         const SizedBox(height: 12),
-        _buildTextField(_contactController, 'Contato*', 'Telefone ou email para contato', Icons.phone, theme),
+        _buildTextField(
+          _contactController,
+          'Contato*',
+          'Telefone ou email para contato',
+          Icons.phone,
+          theme,
+        ),
       ],
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String label, String hint, IconData icon, ThemeData theme, {int maxLines = 1}) {
+  Widget _buildTextField(
+    TextEditingController controller,
+    String label,
+    String hint,
+    IconData icon,
+    ThemeData theme, {
+    int maxLines = 1,
+  }) {
     return TextFormField(
       controller: controller,
       maxLines: maxLines,
@@ -400,8 +493,14 @@ class _AddPetPageState extends State<AddPetPage> {
         filled: true,
         fillColor: theme.cardColor,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: theme.primaryColor)),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: theme.colorScheme.secondary, width: 2)),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: theme.primaryColor),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: theme.colorScheme.secondary, width: 2),
+        ),
       ),
     );
   }

@@ -6,6 +6,7 @@ import 'package:app_projetoyuri/pages/pet_detail_page.dart';
 import 'package:app_projetoyuri/pages/add_pet_page.dart';
 import 'package:app_projetoyuri/pages/edit_pet_page.dart';
 import 'package:app_projetoyuri/utils/constants.dart';
+import 'dart:convert'; // ✅ ADICIONAR ESTE IMPORT
 
 class MyPetsPage extends StatefulWidget {
   const MyPetsPage({super.key});
@@ -209,26 +210,24 @@ class _MyPetCard extends StatelessWidget {
           child: Row(
             children: [
               // Foto
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: theme.primaryColor.withOpacity(0.3),
-                  borderRadius: BorderRadius.circular(12),
-                  image: pet.photos.isNotEmpty
-                      ? DecorationImage(
-                          image: NetworkImage(pet.photos.first),
-                          fit: BoxFit.cover,
-                        )
-                      : null,
-                ),
-                child: pet.photos.isEmpty
-                    ? Icon(Icons.pets, size: 40, color: Colors.grey[600])
-                    : null,
-              ),
-
-              const SizedBox(width: 16),
-
+              // Foto
+Container(
+  width: 80,
+  height: 80,
+  decoration: BoxDecoration(
+    color: theme.primaryColor.withOpacity(0.3),
+    borderRadius: BorderRadius.circular(12),
+    image: pet.photos.isNotEmpty
+        ? DecorationImage(
+            image: NetworkImage(pet.photos.first), // ← PROBLEMA
+            fit: BoxFit.cover,
+          )
+        : null,
+  ),
+  child: pet.photos.isEmpty
+      ? Icon(Icons.pets, size: 40, color: Colors.grey[600])
+      : null,
+),
               // Informações
               Expanded(
                 child: Column(
@@ -257,6 +256,9 @@ class _MyPetCard extends StatelessWidget {
                   ],
                 ),
               ),
+
+              // Menu
+             // ... código anterior ...
 
               // Menu
               PopupMenuButton<String>(
@@ -297,4 +299,40 @@ class _MyPetCard extends StatelessWidget {
       ),
     );
   }
-}
+
+  // ✅ NOVO MÉTODO: Processa imagens Base64 ou URL - DENTRO DA CLASSE!
+  Widget _buildPetImage(String imageData, ThemeData theme) {
+    try {
+      if (imageData.startsWith('data:image')) {
+        // É Base64 - converter para bytes
+        final base64String = imageData.split(',').last;
+        final bytes = base64Decode(base64String);
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Image.memory(
+            bytes,
+            width: 80,
+            height: 80,
+            fit: BoxFit.cover,
+          ),
+        );
+      } else {
+        // É URL normal
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Image.network(
+            imageData,
+            width: 80,
+            height: 80,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) {
+              return Icon(Icons.pets, size: 40, color: Colors.grey[600]);
+            },
+          ),
+        );
+      }
+    } catch (e) {
+      return Icon(Icons.pets, size: 40, color: Colors.grey[600]);
+    }
+  }
+} // ← FIM DA CLASSE _MyPetCard
