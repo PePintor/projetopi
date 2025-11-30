@@ -13,7 +13,7 @@ class Pet {
   final String contact;
   final String userId;
   final DateTime createdAt;
-  final DateTime? updatedAt; // ✅ ADICIONE ESTE CAMPO
+  final DateTime? updatedAt;
 
   Pet({
     required this.id,
@@ -29,7 +29,7 @@ class Pet {
     required this.contact,
     required this.userId,
     required this.createdAt,
-    this.updatedAt, // ✅ OPCIONAL
+    this.updatedAt,
   });
 
   // Método copyWith atualizado
@@ -47,7 +47,7 @@ class Pet {
     String? contact,
     String? userId,
     DateTime? createdAt,
-    DateTime? updatedAt, // ✅ ADICIONE
+    DateTime? updatedAt,
   }) {
     return Pet(
       id: id ?? this.id,
@@ -63,7 +63,7 @@ class Pet {
       contact: contact ?? this.contact,
       userId: userId ?? this.userId,
       createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt, // ✅ INCLUA
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 
@@ -104,7 +104,7 @@ class Pet {
       'contact': contact,
       'userId': userId,
       'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt?.toIso8601String(), // ✅ INCLUA
+      'updatedAt': updatedAt?.toIso8601String(),
     };
   }
 }

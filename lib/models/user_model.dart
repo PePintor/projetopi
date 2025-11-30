@@ -20,7 +20,7 @@ class User {
     this.updatedAt,
   });
 
-  // ✅ COPYWITH - Para atualizações (igual PetModel)
+  //COPYWITH - Para atualizações (igual PetModel)
   User copyWith({
     String? id,
     String? email,
@@ -43,7 +43,7 @@ class User {
     );
   }
 
-  // ✅ FROMJSON - Para MockAPI (igual PetModel)
+  //FROMJSON - Para MockAPI (igual PetModel)
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
       id: json['id'] ?? '',
@@ -59,7 +59,7 @@ class User {
     );
   }
 
-  // ✅ TOJSON - Para MockAPI (igual PetModel)
+  // TOJSON - Para MockAPI (igual PetModel)
   Map<String, dynamic> toJson() {
     return {
       'id': id,

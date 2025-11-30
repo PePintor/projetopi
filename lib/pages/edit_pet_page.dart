@@ -209,7 +209,7 @@ class _EditPetPageState extends State<EditPetPage> {
                               _vaccinated = value ?? false;
                             });
                           },
-                          fillColor: MaterialStateProperty.all(theme.colorScheme.secondary),
+                          fillColor: WidgetStateProperty.all(theme.colorScheme.secondary),
                         ),
                         const Text('Pet vacinado'),
                       ],

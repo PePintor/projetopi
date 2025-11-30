@@ -1,24 +1,22 @@
-// 📱 ARQUIVO: home_page.dart - TELA PRINCIPAL DO APLICATIVO
-// 🎯 OBJETIVO: Navegação principal, busca e listagem de pets
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 // 📂 PÁGINAS
-import 'package:app_projetoyuri/pages/add_pet_page.dart'; // ➕ Tela de cadastro
-import 'package:app_projetoyuri/pages/my_pets_page.dart'; // 🐾 Meus pets
-import 'package:app_projetoyuri/pages/profile_page.dart'; // 👤 Perfil
-import 'package:app_projetoyuri/pages/settings_page.dart'; // ⚙️ Configurações
-import 'package:app_projetoyuri/pages/pet_detail_page.dart'; // 📋 Detalhes do pet
+import 'package:app_projetoyuri/pages/add_pet_page.dart'; // Tela de cadastro
+import 'package:app_projetoyuri/pages/my_pets_page.dart'; // Meus pets
+import 'package:app_projetoyuri/pages/profile_page.dart'; // Perfil
+import 'package:app_projetoyuri/pages/settings_page.dart'; // Configurações
+import 'package:app_projetoyuri/pages/pet_detail_page.dart'; // Detalhes do pet
 
-// 📂 MODELOS E PROVIDERS
-import 'package:app_projetoyuri/models/pet_model.dart'; // 🎯 Modelo de dados
-import 'package:app_projetoyuri/providers/pet_provider.dart'; // 🐾 Provider de pets
+// MODELOS E PROVIDERS
+import 'package:app_projetoyuri/models/pet_model.dart'; // Modelo de dados
+import 'package:app_projetoyuri/providers/pet_provider.dart'; // Provider de pets
 
-// 📂 UTILITÁRIOS
-import 'package:app_projetoyuri/utils/constants.dart'; // 📏 Constantes do app
+// UTILITÁRIOS
+import 'package:app_projetoyuri/utils/constants.dart'; // Constantes do app
 
-// 🏠 HOME PAGE PRINCIPAL
+// HOME PAGE PRINCIPAL
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -27,12 +25,12 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _selectedIndex = 0; // 🎯 Índice da aba selecionada
+  int _selectedIndex = 0; // Índice da aba selecionada
 
   @override
   void initState() {
     super.initState();
-    // 🎬 Configura listener para atualizações do PetProvider após renderização
+    // Configura listener para atualizações do PetProvider após renderização
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         context.read<PetProvider>().addListener(_onPetsChanged);
@@ -42,59 +40,59 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
-    // 🧹 Remove listener para evitar memory leaks
+    // Remove listener para evitar memory leaks
     if (mounted) {
       context.read<PetProvider>().removeListener(_onPetsChanged);
     }
     super.dispose();
   }
 
-  // 🔄 Atualiza UI quando pets mudam
+  // Atualiza UI quando pets mudam
   void _onPetsChanged() {
     if (mounted) setState(() {});
   }
 
-  // 🎯 Gerencia navegação entre abas
+  // Gerencia navegação entre abas
   void _onItemTapped(int index) {
     if (index == 2) {
-      _navigateToAddPet(); // ➕ Aba especial para adicionar pet
+      _navigateToAddPet(); // Aba especial para adicionar pet
     } else {
       setState(() {
-        _selectedIndex = index; // 🔄 Atualiza aba selecionada
+        _selectedIndex = index; // Atualiza aba selecionada
       });
     }
   }
 
-  // 🚀 Navega para a tela de cadastro de pet
+  // Navega para a tela de cadastro de pet
   void _navigateToAddPet() async {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const AddPetPage()),
     );
 
-    // 🔄 Atualiza Home caso um pet tenha sido cadastrado
+    // Atualiza Home caso um pet tenha sido cadastrado
     if (result == true && context.mounted) {
       setState(() {
-        _selectedIndex = 0; // 🏠 Volta para a Home
+        _selectedIndex = 0; // Volta para a Home
       });
       await Future.delayed(const Duration(milliseconds: 500));
       if (context.mounted) setState(() {});
     }
   }
 
-  // 🎯 Retorna a página correspondente à aba selecionada
+  // Retorna a página correspondente à aba selecionada
   Widget _getCurrentPage() {
     switch (_selectedIndex) {
       case 0:
-        return const _HomeContent(); // 🏠 Conteúdo principal
+        return const _HomeContent(); // Conteúdo principal
       case 1:
-        return const MyPetsPage(); // 🐾 Meus pets
+        return const MyPetsPage(); // Meus pets
       case 3:
-        return const ProfilePage(); // 👤 Perfil
+        return const ProfilePage(); // Perfil
       case 4:
-        return const SettingsPage(); // ⚙️ Configurações
+        return const SettingsPage(); // Configurações
       default:
-        return const _HomeContent(); // 🏠 Fallback
+        return const _HomeContent(); // Fallback
     }
   }
 
@@ -103,17 +101,17 @@ class _HomePageState extends State<HomePage> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      // 📝 AppBar com nome do app
+      // AppBar com nome do app
       appBar: AppBar(
         title: const Text(AppConstants.appName),
         backgroundColor: theme.primaryColor,
         foregroundColor: theme.colorScheme.onPrimary,
       ),
 
-      // 🎯 Corpo dinâmico baseado na aba selecionada
+      // Corpo dinâmico baseado na aba selecionada
       body: _getCurrentPage(),
 
-      // 🔽 Barra de navegação inferior
+      // Barra de navegação inferior
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
@@ -138,7 +136,7 @@ extension on ThemeData {
   Color? get bottomAppBarColor => null;
 }
 
-// 🏠 CONTEÚDO PRINCIPAL DA HOME
+// CONTEÚDO PRINCIPAL DA HOME
 class _HomeContent extends StatefulWidget {
   const _HomeContent();
 
@@ -148,11 +146,11 @@ class _HomeContent extends StatefulWidget {
 
 class _HomeContentState extends State<_HomeContent> {
   final TextEditingController _searchController = TextEditingController();
-  String _searchQuery = ''; // 🎯 Estado local da busca
+  String _searchQuery = ''; 
 
   @override
   void dispose() {
-    _searchController.dispose(); // 🧹 Limpa controller
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -162,12 +160,12 @@ class _HomeContentState extends State<_HomeContent> {
 
     return Consumer<PetProvider>(
       builder: (context, petProvider, child) {
-        // 🔍 Filtra pets com base na busca
+        // Filtra pets com base na busca
         final displayedPets = _searchQuery.isEmpty
             ? petProvider.pets
             : petProvider.searchPets(_searchQuery);
 
-        // ⏳ Loading
+        // Loading
         if (petProvider.loading && petProvider.pets.isEmpty) {
           return const Center(
             child: Column(
@@ -181,7 +179,7 @@ class _HomeContentState extends State<_HomeContent> {
           );
         }
 
-        // ❌ Estado de erro
+        // Estado de erro
         if (petProvider.error.isNotEmpty && petProvider.pets.isEmpty) {
           return Center(
             child: Column(
@@ -209,10 +207,10 @@ class _HomeContentState extends State<_HomeContent> {
           );
         }
 
-        // 🎨 UI principal
+        // UI principal
         return Column(
           children: [
-            // 🔍 Campo de busca
+            // Campo de busca
             Padding(
               padding: const EdgeInsets.all(AppConstants.defaultPadding),
               child: Column(
@@ -250,7 +248,7 @@ class _HomeContentState extends State<_HomeContent> {
                   ),
                   const SizedBox(height: 8),
 
-                  // 🎯 Filtros rápidos (apenas quando não há busca)
+                  // Filtros rápidos (apenas quando não há busca)
                   if (_searchQuery.isEmpty)
                     Wrap(
                       spacing: 8,
@@ -267,7 +265,7 @@ class _HomeContentState extends State<_HomeContent> {
               ),
             ),
 
-            // 📜 Resultados da busca
+            // Resultados da busca
             if (_searchQuery.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(
@@ -286,7 +284,7 @@ class _HomeContentState extends State<_HomeContent> {
                 ),
               ),
 
-            // 🐾 Lista de pets
+            // Lista de pets
             Expanded(
               child: RefreshIndicator(
                 onRefresh: () => petProvider.loadPets(), // 🔄 Pull to refresh
@@ -308,7 +306,7 @@ class _HomeContentState extends State<_HomeContent> {
     );
   }
 
-  // 🎯 Filtro rápido
+  // Filtro rápido
   Widget _buildQuickFilter(ThemeData theme, String label, String query) {
     return GestureDetector(
       onTap: () {
@@ -338,7 +336,7 @@ class _HomeContentState extends State<_HomeContent> {
     );
   }
 
-  // 📭 Estado vazio quando não há pets
+  // Estado vazio quando não há pets
   Widget _buildEmptyState(ThemeData theme, String query) {
     return Center(
       child: Column(
@@ -369,7 +367,7 @@ class _HomeContentState extends State<_HomeContent> {
   }
 }
 
-// 🎴 CARD DO PET - Componente reutilizável
+// CARD DO PET - Componente reutilizável
 class _PetCard extends StatefulWidget {
   final Pet pet;
   final ThemeData theme;
@@ -383,7 +381,7 @@ class _PetCard extends StatefulWidget {
 class __PetCardState extends State<_PetCard> {
   Color? _cardColor;
 
-  // 🚀 Navega para detalhes do pet
+  // Navega para detalhes do pet
   void _navigateToPetDetail(BuildContext context) {
     Navigator.push(
       context,
@@ -419,7 +417,7 @@ onTap: () {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 🖼️ Imagem do pet
+            // Imagem do pet
             ClipRRect(
               borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(AppConstants.defaultBorderRadius)),
@@ -467,7 +465,7 @@ onTap: () {
     );
   }
 
-  // 🖼️ Placeholder para pets sem foto
+  // Placeholder para pets sem foto
   Widget _buildPlaceholderImage(ThemeData theme) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,

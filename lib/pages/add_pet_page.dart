@@ -129,9 +129,11 @@ class _AddPetPageState extends State<AddPetPage> {
       if (success) {
         _showSuccess();
         _resetForm();
+        // ignore: use_build_context_synchronously
         Navigator.of(context).pop(true);
       } else {
         _showError(
+            // ignore: use_build_context_synchronously
             'Erro ao cadastrar pet: ${context.read<PetProvider>().error}');
       }
     } catch (e) {

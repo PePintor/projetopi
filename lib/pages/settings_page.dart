@@ -5,38 +5,6 @@ import 'package:app_projetoyuri/providers/theme_provider.dart';
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
 
-  void _showLogoutDialog(BuildContext context) {
-    final secondaryColor = Theme.of(context).colorScheme.secondary;
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Sair da Conta'),
-        content: const Text('Tem certeza que deseja sair?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Cancelar', style: TextStyle(color: secondaryColor)),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Text('Você saiu da conta'),
-                  backgroundColor: secondaryColor,
-                ),
-              );
-              Future.delayed(const Duration(seconds: 1), () {
-                Navigator.pushReplacementNamed(context, '/login');
-              });
-            },
-            child: Text('Sair', style: TextStyle(color: secondaryColor)),
-          ),
-        ],
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +23,6 @@ class SettingsPage extends StatelessWidget {
         padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
-            // TEMA ESCURO FUNCIONAL PARA TODO O APP
             Card(
               elevation: 2,
               child: ListTile(
@@ -71,6 +38,7 @@ class SettingsPage extends StatelessWidget {
                         .textTheme
                         .bodyMedium
                         ?.color
+                        // ignore: deprecated_member_use
                         ?.withOpacity(0.7),
                   ),
                 ),
@@ -82,8 +50,8 @@ class SettingsPage extends StatelessWidget {
                       SnackBar(
                         content: Text(
                           value
-                              ? 'Tema escuro ativado 🌙'
-                              : 'Tema claro ativado ☀️',
+                              ? 'Tema escuro ativado'
+                              : 'Tema claro ativado',
                           style: const TextStyle(color: Colors.white),
                         ),
                         backgroundColor: primaryColor,
@@ -152,23 +120,6 @@ class SettingsPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-
-            // BOTÃO SAIR
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () => _showLogoutDialog(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: secondaryColor,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                child: const Text('Sair da Conta'),
-              ),
-            ),
           ],
         ),
       ),
