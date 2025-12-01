@@ -8,11 +8,11 @@ class ImagePickerUtils {
 
   static Future<List<Uint8List>?> pickMultipleImages() async {
     try {
-      // ✅ REDUZIDO para evitar travamentos
+      //  REDUZIDO para evitar travamentos
       final List<XFile>? images = await _picker.pickMultiImage(
-        maxWidth: 800, // ↓ REDUZIDO
-        maxHeight: 600, // ↓ REDUZIDO
-        imageQuality: 60, // ↓ REDUZIDO
+        maxWidth: 800, // O
+        maxHeight: 600, // 
+        imageQuality: 60, //
       );
 
       if (images != null && images.isNotEmpty) {
@@ -20,7 +20,7 @@ class ImagePickerUtils {
         for (final image in images) {
           final bytes = await image.readAsBytes();
 
-          // ✅ VERIFICA TAMANHO ANTES DE ADICIONAR
+          //  VERIFICA TAMANHO ANTES DE ADICIONAR
           if (bytes.length > 2 * 1024 * 1024) {
             // 2MB
             throw Exception(
@@ -41,15 +41,15 @@ class ImagePickerUtils {
     try {
       final XFile? image = await _picker.pickImage(
         source: ImageSource.gallery,
-        maxWidth: 800, // ↓ REDUZIDO
-        maxHeight: 600, // ↓ REDUZIDO
-        imageQuality: 60, // ↓ REDUZIDO
+        maxWidth: 800, // 
+        maxHeight: 600, // 
+        imageQuality: 60, //
       );
 
       if (image != null) {
         final bytes = await image.readAsBytes();
 
-        // ✅ VERIFICA TAMANHO
+        //  VERIFICA TAMANHO
         if (bytes.length > 2 * 1024 * 1024) {
           throw Exception(
               'Imagem muito grande: ${(bytes.length / 1024 / 1024).toStringAsFixed(1)}MB');
@@ -63,7 +63,7 @@ class ImagePickerUtils {
     }
   }
 
-  // ✅ NOVO: Método com compressão automática
+  // NOVO: Método com compressão automática
   static Future<List<Uint8List>?> pickAndCompressImages() async {
     try {
       final List<XFile>? images = await _picker.pickMultiImage(
@@ -78,7 +78,7 @@ class ImagePickerUtils {
         for (final image in images) {
           var bytes = await image.readAsBytes();
 
-          // ✅ COMPRIME se for maior que 1MB
+           
           if (bytes.length > 1 * 1024 * 1024) {
             bytes = await _compressImage(bytes);
           }
@@ -93,7 +93,7 @@ class ImagePickerUtils {
     }
   }
 
-  // ✅ NOVO: Compressão simples
+  //  
   static Future<Uint8List> _compressImage(Uint8List bytes) async {
     try {
       // Simula compressão reduzindo qualidade

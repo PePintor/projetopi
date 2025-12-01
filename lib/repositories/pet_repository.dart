@@ -74,7 +74,7 @@ class PetRepository {
     }
   }
 
-  // ✅ MÉTODO PARA ATUALIZAR PET
+  //  MÉTODO PARA ATUALIZAR PET
   Future<Pet> updatePet(Pet pet) async {
     try {
       print('🔄 ATUALIZANDO PET NA API: ${pet.name}');
@@ -106,7 +106,7 @@ class PetRepository {
     }
   }
 
-  // ✅ MÉTODO PARA REMOVER PET
+  //  MÉTODO PARA REMOVER PET
   Future<void> deletePet(String petId) async {
     try {
       print('🗑️ REMOVENDO PET: $petId');

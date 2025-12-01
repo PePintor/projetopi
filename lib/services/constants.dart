@@ -1,9 +1,9 @@
 class AppConstants {
-  // API Configuration - ✅ MANTIDO COMO FALLBACK
+  
   static const String apiBaseUrl = 'https://jsonplaceholder.typicode.com';
   static const int apiTimeoutSeconds = 30;
 
-  // ✅ ADICIONADO: Placeholder para imagens
+  
   static const String placeholderImage = 'https://via.placeholder.com/150';
 
   // Storage Keys

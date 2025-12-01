@@ -1,4 +1,4 @@
-import 'dart:convert'; // ✅ IMPORT ADICIONADO
+import 'dart:convert'; 
 import 'package:flutter/material.dart';
 import 'package:app_projetoyuri/models/pet_model.dart';
 
@@ -29,7 +29,7 @@ class PetDetailPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Fotos do pet - ✅ CORRIGIDO
+            // Fotos do pet 
             Container(
               height: 200,
               decoration: BoxDecoration(
@@ -37,7 +37,7 @@ class PetDetailPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: pet.photos.isNotEmpty
-                  ? _buildPetImage(pet.photos.first, darkText) // ✅ NOVO MÉTODO
+                  ? _buildPetImage(pet.photos.first, darkText) 
                   : Center(
                       child: Icon(
                         Icons.pets,
@@ -165,7 +165,7 @@ class PetDetailPage extends StatelessWidget {
     );
   }
 
-  // ✅ NOVO MÉTODO: Processa imagens Base64 ou URL
+ 
   Widget _buildPetImage(String imageData, Color darkText) {
     try {
       if (imageData.startsWith('data:image')) {
@@ -201,7 +201,7 @@ class PetDetailPage extends StatelessWidget {
     }
   }
 
-  // ✅ MÉTODO AUXILIAR: Placeholder para erro
+ 
   Widget _buildPlaceholderImage(Color darkText) {
     return Center(
       child: Column(

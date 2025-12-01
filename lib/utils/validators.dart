@@ -1,4 +1,5 @@
 // lib/utils/validators.dart
+import 'dart:typed_data';
 import 'constants.dart';
 
 class Validators {
@@ -167,19 +168,29 @@ class Validators {
     return null;
   }
 
-  // Validação de espécie - VERSÃO CORRIGIDA (aceita minúsculas)
+  // Validação de espécie - VERSÃO CORRIGIDA E FLEXÍVEL
   static String? validateSpecies(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return AppConstants.requiredFieldMessage;
+      return 'Espécie é obrigatória';
     }
-
-    // ✅ CORREÇÃO: Converte para a formatação correta e compara
+    
+    // Converte para formato padrão para comparação
     final formattedValue = _capitalizeFirstLetter(value.trim());
-
-    if (!AppConstants.petSpecies.contains(formattedValue)) {
-      return 'Selecione uma espécie válida';
+    
+    // Lista flexível de espécies aceitas
+    final validSpecies = [
+      'Cachorro', 'Gato', 'Hamster', 'Calopsita', 'Pássaro', 
+      'Roedor', 'Réptil', 'Peixe', 'Outros'
+    ];
+    
+    // Verifica se a espécie está na lista (case insensitive)
+    final isValid = validSpecies.any((species) => 
+        species.toLowerCase() == formattedValue.toLowerCase());
+    
+    if (!isValid) {
+      return 'Espécie inválida. Use: Cachorro, Gato, Hamster, Calopsita, Pássaro, Roedor, Réptil, Peixe ou Outros';
     }
-
+    
     return null;
   }
 
@@ -189,13 +200,12 @@ class Validators {
     return text[0].toUpperCase() + text.substring(1).toLowerCase();
   }
 
-  // Validação de raça
+  // Validação de raça - VERSÃO CORRIGIDA
   static String? validateBreed(String? value, String? species) {
     if (value == null || value.trim().isEmpty) {
-      return AppConstants.requiredFieldMessage;
+      return 'Raça é obrigatória';
     }
 
-    // Para outras espécies, apenas verifica se não está vazio
     if (value.trim().length < 2) {
       return 'Raça deve ter pelo menos 2 caracteres';
     }
@@ -229,8 +239,8 @@ class Validators {
     return null;
   }
 
-  // Validação de número de imagens
-  static String? validateImages(List<dynamic>? images) {
+  // Validação de número de imagens - VERSÃO CORRIGIDA
+  static String? validateImages(List<Uint8List>? images) {
     if (images == null || images.isEmpty) {
       return 'Adicione pelo menos uma foto do pet';
     }
@@ -255,7 +265,7 @@ class Validators {
     return null;
   }
 
-  // ✅ NOVA VALIDAÇÃO: Bio do usuário (opcional)
+  // ✅ NOVA VALIDAÇÃO: Bio do usuário 
   static String? validateBio(String? value) {
     if (value == null || value.trim().isEmpty) {
       return null; // Bio é opcional
@@ -277,7 +287,7 @@ class Validators {
     required String? description,
     required String? location,
     required String? contact,
-    required List<dynamic>? images,
+    required List<Uint8List>? images,
     String? size,
     String? gender,
     String? careInstructions,

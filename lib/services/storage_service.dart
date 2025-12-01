@@ -87,7 +87,7 @@ class StorageService {
     return null;
   }
 
-  // ✅ NOVO: Remove apenas dados do usuário
+  //  Remove apenas dados do usuário
   Future<void> clearUser() async {
     try {
       final prefs = await SharedPreferences.getInstance();

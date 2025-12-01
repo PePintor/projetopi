@@ -5,7 +5,7 @@ import 'package:app_projetoyuri/models/user_model.dart';
 import 'package:app_projetoyuri/utils/constants.dart';
 
 class UserRepository {
-  // ✅ SALVA USUÁRIO - igual addPet
+  // SALVA USUÁRIO - igual addPet
   Future<User> saveUser(User user) async {
     print('💾 SALVANDO USUÁRIO: ${user.email}');
 
@@ -22,7 +22,7 @@ class UserRepository {
     }
   }
 
-  // ✅ BUSCA USUÁRIO ATUAL - igual getPets
+  //  BUSCA USUÁRIO ATUAL - igual getPets
   Future<User?> getCurrentUser() async {
     print('🌐 BUSCANDO USUÁRIO...');
 
@@ -45,7 +45,7 @@ class UserRepository {
     }
   }
 
-  // ✅ ATUALIZA USUÁRIO - igual updatePet
+  //  ATUALIZA USUÁRIO 
   Future<User> updateUser(User user) async {
     print('🔄 ATUALIZANDO USUÁRIO: ${user.name}');
 
@@ -62,7 +62,7 @@ class UserRepository {
     }
   }
 
-  // ✅ REMOVE USUÁRIO - igual deletePet
+  // REMOVE USUÁRIO 
   Future<void> clearUser() async {
     print('🗑️ REMOVENDO USUÁRIO...');
 

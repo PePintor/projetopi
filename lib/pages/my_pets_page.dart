@@ -6,7 +6,7 @@ import 'package:app_projetoyuri/pages/pet_detail_page.dart';
 import 'package:app_projetoyuri/pages/add_pet_page.dart';
 import 'package:app_projetoyuri/pages/edit_pet_page.dart';
 import 'package:app_projetoyuri/utils/constants.dart';
-import 'dart:convert'; // ✅ ADICIONAR ESTE IMPORT
+import 'dart:convert'; // 
 
 class MyPetsPage extends StatefulWidget {
   const MyPetsPage({super.key});
@@ -300,7 +300,7 @@ Container(
     );
   }
 
-  // ✅ NOVO MÉTODO: Processa imagens Base64 ou URL - DENTRO DA CLASSE!
+  //  NOVO MÉTODO: Processa imagens Base64 ou URL - DENTRO DA CLASSE!
   Widget _buildPetImage(String imageData, ThemeData theme) {
     try {
       if (imageData.startsWith('data:image')) {

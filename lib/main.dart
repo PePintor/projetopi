@@ -59,7 +59,7 @@ final darkTheme = ThemeData(
 );
 
 void main() async {
-  // ✅ CONFIGURAÇÃO CORRETA
+  //  CONFIGURAÇÃO CORRETA
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: '.env');
 

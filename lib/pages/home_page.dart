@@ -1,9 +1,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'dart:convert'; // ✅ ADICIONAR ESTE IMPORT
+import 'dart:convert'; //
 
-// 📂 PÁGINAS
+//  PÁGINAS
 import 'package:app_projetoyuri/pages/add_pet_page.dart'; // Tela de cadastro
 import 'package:app_projetoyuri/pages/my_pets_page.dart'; // Meus pets
 import 'package:app_projetoyuri/pages/profile_page.dart'; // Perfil
@@ -389,7 +389,7 @@ class __PetCardState extends State<_PetCard> {
     );
   }
 
-  // ✅ NOVO MÉTODO: Processa imagens Base64 ou URL
+  //
   Widget _buildPetImage(String imageData) {
     try {
       if (imageData.startsWith('data:image')) {

@@ -19,7 +19,7 @@ class AuthProvider with ChangeNotifier {
     _loadCurrentUser();
   }
 
-  // ✅ CARREGA USUÁRIO - igual PetProvider.loadPets()
+  //  CARREGA USUÁRIO - igual PetProvider.loadPets()
   Future<void> _loadCurrentUser() async {
     _loading = true;
     _error = '';
@@ -36,7 +36,7 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  // ✅ LOGIN - igual PetProvider.addPet()
+  //  LOGIN - igual PetProvider.addPet()
   Future<bool> login(String email, String password) async {
     print('🟡 INICIANDO login - Email: $email');
     _loading = true;
@@ -79,7 +79,7 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  // ✅ ATUALIZAR PERFIL - igual PetProvider.updatePet()
+  //  ATUALIZAR PERFIL - igual PetProvider.updatePet()
   Future<bool> updateProfile(User updatedUser) async {
     print('🔄 ATUALIZANDO PERFIL NO PROVIDER: ${updatedUser.name}');
     _loading = true;
@@ -109,7 +109,7 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  // ✅ LOGOUT - igual PetProvider.removePet()
+  //  LOGOUT - igual PetProvider.removePet()
   Future<bool> logout() async {
     print('🔵 INICIANDO logout');
     _loading = true;
@@ -135,7 +135,7 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  // ✅ MÉTODO AUXILIAR - Gera nome baseado no email
+  //  MÉTODO AUXILIAR - Gera nome baseado no email
   String _generateNameFromEmail(String email) {
     final emailPart = email.split('@').first;
     final name = emailPart.replaceAll('.', ' ').replaceAll('_', ' ');

@@ -1,5 +1,4 @@
-import 'dart:typed_data';
-import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:app_projetoyuri/providers/pet_provider.dart';
@@ -7,6 +6,8 @@ import 'package:app_projetoyuri/models/pet_model.dart';
 import 'package:app_projetoyuri/utils/image_picker.dart';
 import 'package:app_projetoyuri/utils/validators.dart';
 import 'package:app_projetoyuri/utils/constants.dart';
+import 'dart:typed_data';
+import 'dart:convert';
 
 class AddPetPage extends StatefulWidget {
   const AddPetPage({super.key});
@@ -108,8 +109,7 @@ class _AddPetPageState extends State<AddPetPage> {
   setState(() => _loading = true);
 
   try {
-    // ✅ SOLUÇÃO: URLs FICTÍCIAS (funciona com MockAPI)
-  // ✅ CORREÇÃO: URLs completas sem cortes
+
 final List<String> photoUrls = List.generate(_selectedImages.length, (index) {
   final timestamp = DateTime.now().millisecondsSinceEpoch + index;
   return 'https://picsum.photos/400/300?random=$timestamp';
@@ -146,7 +146,7 @@ final List<String> photoUrls = List.generate(_selectedImages.length, (index) {
   }
 }
   void _resetForm() {
-    // ✅ VERIFICA SE A TELA AINDA ESTÁ ATIVA
+   
     if (!mounted) return;
 
     try {
@@ -195,7 +195,7 @@ final List<String> photoUrls = List.generate(_selectedImages.length, (index) {
         actions: [
           IconButton(
             icon: const Icon(Icons.clear),
-            onPressed: _loading ? null : _resetForm, // ✅ SEGURO
+            onPressed: _loading ? null : _resetForm, 
             tooltip: 'Limpar formulário',
             color: theme.appBarTheme.foregroundColor,
           ),

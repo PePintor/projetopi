@@ -73,7 +73,7 @@ class User {
     };
   }
 
-  // ✅ USUÁRIO VAZIO - Para inicialização
+ 
   static User empty() {
     return User(
       id: '',
@@ -83,6 +83,6 @@ class User {
     );
   }
 
-  // ✅ VERIFICAR SE É USUÁRIO VÁLIDO
+  //  VERIFICAR SE É USUÁRIO VÁLIDO
   bool get isValid => id.isNotEmpty && email.isNotEmpty && name.isNotEmpty;
 }

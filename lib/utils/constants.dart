@@ -1,8 +1,8 @@
 // lib/utils/constants.dart
 
 class AppConstants {
-  // API Configuration
-  static const String apiBaseUrl = 'https://jsonplaceholder.typicode.com';
+  // API Configuration - ATUALIZADO para seu MockAPI real
+  static const String apiBaseUrl = 'https://69177d39a7a34288a280f135.mockapi.io/api/v1';
   static const int apiTimeoutSeconds = 30;
 
   // Storage Keys
@@ -28,7 +28,7 @@ class AppConstants {
   static const Duration snackBarDuration = Duration(seconds: 3);
   static const Duration pageTransitionDuration = Duration(milliseconds: 500);
 
-  // utils/constants.dart - ATUALIZE ESTA LISTA:
+
   static const List<String> petSpecies = [
     'Cachorro',
     'Gato',
@@ -40,6 +40,13 @@ class AppConstants {
     'Peixe',
     'Outros'
   ];
+
+  
+  static bool isValidSpecies(String species) {
+    return petSpecies.any((s) => s.toLowerCase() == species.toLowerCase());
+  }
+
+  // Raças por espécie
   static const List<String> dogBreeds = [
     'Vira-lata',
     'Labrador Retriever',
@@ -100,71 +107,26 @@ class AppConstants {
 
   // Location Options
   static const List<String> brazilianStates = [
-    'AC',
-    'AL',
-    'AP',
-    'AM',
-    'BA',
-    'CE',
-    'DF',
-    'ES',
-    'GO',
-    'MA',
-    'MT',
-    'MS',
-    'MG',
-    'PA',
-    'PB',
-    'PR',
-    'PE',
-    'PI',
-    'RJ',
-    'RN',
-    'RS',
-    'RO',
-    'RR',
-    'SC',
-    'SP',
-    'SE',
-    'TO'
+    'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS',
+    'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC',
+    'SP', 'SE', 'TO'
   ];
 
   static const List<String> cities = [
-    'São Paulo',
-    'Rio de Janeiro',
-    'Belo Horizonte',
-    'Curitiba',
-    'Porto Alegre',
-    'Salvador',
-    'Fortaleza',
-    'Recife',
-    'Brasília',
-    'Goiânia',
-    'Manaus',
-    'Belém',
-    'Florianópolis',
-    'Vitória',
-    'Natal',
-    'João Pessoa',
-    'Maceió',
-    'Teresina',
-    'Campo Grande',
-    'Cuiabá',
-    'Outra'
+    'São Paulo', 'Rio de Janeiro', 'Belo Horizonte', 'Curitiba', 'Porto Alegre',
+    'Salvador', 'Fortaleza', 'Recife', 'Brasília', 'Goiânia', 'Manaus', 'Belém',
+    'Florianópolis', 'Vitória', 'Natal', 'João Pessoa', 'Maceió', 'Teresina',
+    'Campo Grande', 'Cuiabá', 'Outra'
   ];
 
   // Validation Messages
   static const String requiredFieldMessage = 'Este campo é obrigatório';
   static const String invalidEmailMessage = 'Digite um email válido';
-  static const String shortPasswordMessage =
-      'Senha deve ter pelo menos 6 caracteres';
+  static const String shortPasswordMessage = 'Senha deve ter pelo menos 6 caracteres';
   static const String phoneInvalidMessage = 'Digite um telefone válido';
-  static const String nameTooShortMessage =
-      'Nome deve ter pelo menos 2 caracteres';
-  static const String descriptionTooShortMessage =
-      'Descrição deve ter pelo menos 10 caracteres';
-  static const String descriptionTooLongMessage =
-      'Descrição deve ter no máximo 500 caracteres';
+  static const String nameTooShortMessage = 'Nome deve ter pelo menos 2 caracteres';
+  static const String descriptionTooShortMessage = 'Descrição deve ter pelo menos 10 caracteres';
+  static const String descriptionTooLongMessage = 'Descrição deve ter no máximo 500 caracteres';
 
   // Success Messages
   static const String petAddedSuccess = 'Pet cadastrado com sucesso!';
@@ -182,12 +144,14 @@ class AppConstants {
   static const String noPetsFound = 'Nenhum pet encontrado.';
   static const String noInternet = 'Sem conexão com a internet.';
 
-  // Image Configuration
+  
   static const int maxImages = 5;
   static const int imageQuality = 85;
   static const int maxImageWidth = 1200;
   static const int maxImageHeight = 900;
   static const int maxImageSizeMB = 2;
+  static const String defaultPetImage = 'https://picsum.photos/400/300?random=';
+  static const String userAvatarBaseUrl = 'https://cdn.jsdelivr.net/gh/faker-js/assets-person-portrait/';
 
   // Mock Data for Development
   static const List<Map<String, dynamic>> mockPets = [
@@ -259,4 +223,24 @@ class AppConstants {
   static const bool requireEmailVerification = false;
   static const int maxPetsPerUser = 10;
   static const int cacheDurationHours = 24;
+
+ 
+  static String generateImageUrl() {
+    return '${defaultPetImage}${DateTime.now().millisecondsSinceEpoch}';
+  }
+
+  
+  static List<String> getBreedsForSpecies(String species) {
+    switch (species.toLowerCase()) {
+      case 'cachorro':
+        return dogBreeds;
+      case 'gato':
+        return catBreeds;
+      case 'pássaro':
+      case 'calopsita':
+        return birdBreeds;
+      default:
+        return ['Outra']; // Para outras espécies
+    }
+  }
 }

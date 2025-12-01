@@ -108,7 +108,7 @@ class PetProvider with ChangeNotifier {
     }
   }
 
-  // ✅ MÉTODO PARA REMOVER PET
+  // MÉTODO PARA REMOVER PET
   Future<bool> removePet(String petId) async {
     print('🗑️ REMOVENDO PET: $petId');
     _loading = true;
@@ -138,7 +138,7 @@ class PetProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // ✅ MÉTODO DE PESQUISA CORRETO - SÓ CAMPOS QUE EXISTEM
+  //  MÉTODO DE PESQUISA CORRETO - SÓ CAMPOS QUE EXISTEM
   List<Pet> searchPets(String query) {
     if (query.isEmpty) return _pets;
 
@@ -158,7 +158,7 @@ class PetProvider with ChangeNotifier {
     }).toList();
   }
 
-  // ✅ BUSCA FLEXÍVEL POR ESPÉCIE
+  //  BUSCA FLEXÍVEL POR ESPÉCIE
   bool _matchesSpecies(String query, String species) {
     final speciesLower = species.toLowerCase();
 
@@ -180,7 +180,7 @@ class PetProvider with ChangeNotifier {
     return false;
   }
 
-  // ✅ BUSCA POR STATUS DE VACINA (campo que existe!)
+  //  BUSCA POR STATUS DE VACINA (campo que existe!)
   bool _matchesVaccinated(String query, bool vaccinated) {
     final vaccinatedMap = {
       true: ['vacinado', 'vacina', 'vaccinated', 'vacinada', 'vacinados'],
