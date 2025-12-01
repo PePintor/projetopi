@@ -110,11 +110,11 @@ class _AddPetPageState extends State<AddPetPage> {
 
   try {
 
-final List<String> photoUrls = List.generate(_selectedImages.length, (index) {
-  final timestamp = DateTime.now().millisecondsSinceEpoch + index;
-  return 'https://picsum.photos/400/300?random=$timestamp';
-});
-
+final List<String> photoUrls = _selectedImages.map((imageBytes) {
+  final base64String = base64Encode(imageBytes);
+  return 'data:image/jpeg;base64,$base64String';
+}).toList();
+   
     final pet = Pet(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       name: _nameController.text,
