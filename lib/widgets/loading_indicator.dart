@@ -17,5 +17,3 @@ class LoadingIndicator extends StatelessWidget {
     );
   }
 }
-
-
