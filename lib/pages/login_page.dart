@@ -26,26 +26,25 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final screenHeight = MediaQuery.of(context).size.height;
 
     return Consumer<AuthProvider>(
       builder: (context, authProvider, child) {
         return Scaffold(
           backgroundColor: theme.scaffoldBackgroundColor,
           body: SafeArea(
-            // APENAS ISSO RESOLVE: SingleChildScrollView
             child: SingleChildScrollView(
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      // IMPORTANTE: mainAxisSize.min
-                      mainAxisSize: MainAxisSize.min,
+              child: Container(
+                height: screenHeight - MediaQuery.of(context).padding.top,
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // Logo e título
+                    Column(
                       children: [
-                        // Logo
                         SizedBox(
-                          height: 80,
+                          height: 100,
                           child: Image.asset(
                             'assets/images/logoAdotaJa.png',
                             fit: BoxFit.contain,
@@ -55,126 +54,131 @@ class _LoginPageState extends State<LoginPage> {
                         Text(
                           'AdojaJá',
                           style: TextStyle(
-                            fontSize: 28,
+                            fontSize: 32,
                             fontWeight: FontWeight.bold,
                             color: theme.primaryColor,
                           ),
                         ),
                         const SizedBox(height: 40),
-
-                        // E-mail
-                        TextFormField(
-                          controller: _emailController,
-                          decoration: InputDecoration(
-                            labelText: 'E-mail',
-                            labelStyle: TextStyle(color: theme.primaryColor),
-                            border: const OutlineInputBorder(),
-                            prefixIcon:
-                                Icon(Icons.email, color: theme.primaryColor),
-                          ),
-                          keyboardType: TextInputType.emailAddress,
-                          validator: Validators.validateEmail,
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                        ),
-                        const SizedBox(height: 16),
-
-                        // Senha
-                        TextFormField(
-                          controller: _passwordController,
-                          obscureText: _obscurePassword,
-                          decoration: InputDecoration(
-                            labelText: 'Senha',
-                            labelStyle: TextStyle(color: theme.primaryColor),
-                            border: const OutlineInputBorder(),
-                            prefixIcon:
-                                Icon(Icons.lock, color: theme.primaryColor),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _obscurePassword
-                                    ? Icons.visibility
-                                    : Icons.visibility_off,
-                                color: theme.primaryColor,
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  _obscurePassword = !_obscurePassword;
-                                });
-                              },
-                            ),
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'A senha é obrigatória';
-                            }
-                            if (value.length < 6) {
-                              return 'Senha deve ter pelo menos 6 caracteres';
-                            }
-                            return null;
-                          },
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                        ),
-                        const SizedBox(height: 24),
-
-                        // Botão de login
-                        SizedBox(
-                          width: double.infinity,
-                          height: 50,
-                          child: authProvider.loading
-                              ? Center(
-                                  child: CircularProgressIndicator(
-                                      color: theme.primaryColor))
-                              : ElevatedButton(
-                                  onPressed: () =>
-                                      _login(context, authProvider),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: theme.primaryColor,
-                                    foregroundColor:
-                                        theme.colorScheme.onPrimary,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                  child: const Text(
-                                    'Entrar',
-                                    style: TextStyle(fontSize: 16),
-                                  ),
-                                ),
-                        ),
-                        const SizedBox(height: 16),
-
-                        // Mensagem de erro
-                        if (authProvider.error.isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 16),
-                            child: Text(
-                              authProvider.error,
-                              style: TextStyle(
-                                color: theme.colorScheme.error,
-                                fontSize: 14,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-
-                        // Cadastre-se
-                        TextButton(
-                          onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content:
-                                    const Text('Cadastro em desenvolvimento'),
-                                backgroundColor: theme.primaryColor,
-                              ),
-                            );
-                          },
-                          child: Text(
-                            'Não tem conta? Cadastre-se',
-                            style: TextStyle(color: theme.primaryColor),
-                          ),
-                        ),
                       ],
                     ),
-                  ),
+
+                    // Formulário
+                    Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          // E-mail
+                          TextFormField(
+                            controller: _emailController,
+                            decoration: InputDecoration(
+                              labelText: 'E-mail',
+                              labelStyle: TextStyle(color: theme.primaryColor),
+                              border: const OutlineInputBorder(),
+                              prefixIcon: Icon(Icons.email, color: theme.primaryColor),
+                            ),
+                            keyboardType: TextInputType.emailAddress,
+                            validator: Validators.validateEmail,
+                            autovalidateMode: AutovalidateMode.onUserInteraction,
+                          ),
+                          const SizedBox(height: 20),
+
+                          // Senha
+                          TextFormField(
+                            controller: _passwordController,
+                            obscureText: _obscurePassword,
+                            decoration: InputDecoration(
+                              labelText: 'Senha',
+                              labelStyle: TextStyle(color: theme.primaryColor),
+                              border: const OutlineInputBorder(),
+                              prefixIcon: Icon(Icons.lock, color: theme.primaryColor),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _obscurePassword
+                                      ? Icons.visibility
+                                      : Icons.visibility_off,
+                                  color: theme.primaryColor,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _obscurePassword = !_obscurePassword;
+                                  });
+                                },
+                              ),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'A senha é obrigatória';
+                              }
+                              if (value.length < 6) {
+                                return 'Senha deve ter pelo menos 6 caracteres';
+                              }
+                              return null;
+                            },
+                            autovalidateMode: AutovalidateMode.onUserInteraction,
+                          ),
+                          const SizedBox(height: 30),
+
+                          // Botão de login
+                          SizedBox(
+                            width: double.infinity,
+                            height: 50,
+                            child: authProvider.loading
+                                ? Center(
+                                    child: CircularProgressIndicator(
+                                      color: theme.primaryColor,
+                                    ),
+                                  )
+                                : ElevatedButton(
+                                    onPressed: () => _login(context, authProvider),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: theme.primaryColor,
+                                      foregroundColor: theme.colorScheme.onPrimary,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    child: const Text(
+                                      'Entrar',
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                  ),
+                          ),
+                          const SizedBox(height: 20),
+
+                          // Mensagem de erro
+                          if (authProvider.error.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 16),
+                              child: Text(
+                                authProvider.error,
+                                style: TextStyle(
+                                  color: theme.colorScheme.error,
+                                  fontSize: 14,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+
+                          // Cadastre-se
+                          TextButton(
+                            onPressed: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: const Text('Cadastro em desenvolvimento'),
+                                  backgroundColor: theme.primaryColor,
+                                ),
+                              );
+                            },
+                            child: Text(
+                              'Não tem conta? Cadastre-se',
+                              style: TextStyle(color: theme.primaryColor),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
